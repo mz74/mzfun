@@ -4,7 +4,7 @@
 \alias{zsum}
 \title{Sum two numerics}
 \usage{
-zsum(a, b)
+zsum(a = 1, b = 2)
 }
 \arguments{
 \item{a}{numeric}

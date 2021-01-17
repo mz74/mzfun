@@ -10,6 +10,8 @@
 #'
 #' @examples
 #' zsum(2,5)
-zsum = function(a, b){
-  return (a+b)
+zsum = function(a=1, b=2){
+  #return (a+b)
+  x = Sys.time()+1
+  return (x)
 }
