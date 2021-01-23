@@ -24,7 +24,7 @@ add_table_bottom = function(ftable, ffun = sum, fname=NA){
 
   # helper function
   dfun = function(dx){
-    if (class(dx) %in% c('numeric', 'integer')) return (ffun(dx))
+    if (class(dx) %in% c('numeric', 'integer')) return (ffun(dx, na.rm = TRUE))
     return (NA)
   }
 
