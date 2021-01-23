@@ -8,6 +8,7 @@
 #' @importFrom data.table :=
 #'
 #' @examples
+#' \dontrun{zdt(tab)}
 zdt = function(a){
   id = NULL
   new = data.table::setDT(a)

@@ -17,3 +17,6 @@ data.table
 Test function for data.table
 #'
 }
+\examples{
+\dontrun{zdt(tab)}
+}
