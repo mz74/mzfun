@@ -7,6 +7,8 @@ load_all()
 check()
 install()
 
+# change readme.rmd and then
+build_readme()
 
 # test 'add_table_bottom'
 library(data.table)

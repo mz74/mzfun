@@ -1,13 +1,13 @@
 Package: mzfun
 Title: mz's r functions
-Version: 0.0.0.9000
+Version: 0.1
 Authors@R: 
     person(given = "M",
            family = "Z",
            role = c("aut", "cre"),
            email = "martin.zehetmayer@gmx.net",
            comment = c(ORCID = "YOUR-ORCID-ID"))
-Description: What the package does (one paragraph).
+Description: Just a collection of useful functions.
 License: MIT + file LICENSE
 Encoding: UTF-8
 LazyData: true

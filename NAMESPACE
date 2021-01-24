@@ -2,7 +2,4 @@
 
 export(add_table_bottom)
 export(add_table_right)
-export(zdt)
-export(zsum)
 import(data.table)
-importFrom(data.table,":=")

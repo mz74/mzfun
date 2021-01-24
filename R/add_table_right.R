@@ -1,4 +1,4 @@
-#' Add aggregation column to table
+#' Adds aggregation column to table
 #'
 #' @param ftable data.frame or data.table
 #' @param ffun aggregation function such as sum, mean, etc.
@@ -14,7 +14,7 @@
 #' @import data.table
 #'
 #' @examples
-#' #' \dontrun{add_table_right(dt)}
+#' \dontrun{add_table_right(dt)}
 add_table_right = function(ftable, ffun = sum, colname = 'Result', fcols = NA){
   # store original class
   dclass = class(ftable[0])

@@ -2,7 +2,7 @@
 % Please edit documentation in R/add_table_right.R
 \name{add_table_right}
 \alias{add_table_right}
-\title{Add aggregation column to table}
+\title{Adds aggregation column to table}
 \usage{
 add_table_right(ftable, ffun = sum, colname = "Result", fcols = NA)
 }
@@ -22,8 +22,8 @@ columns are included.}
 data.frame or data.table
 }
 \description{
-Add aggregation column to table
+Adds aggregation column to table
 }
 \examples{
-#' \dontrun{add_table_right(dt)}
+\dontrun{add_table_right(dt)}
 }
