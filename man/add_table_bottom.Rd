@@ -2,7 +2,7 @@
 % Please edit documentation in R/add_table_bottom.R
 \name{add_table_bottom}
 \alias{add_table_bottom}
-\title{Adds}
+\title{Adds bottom aggregation row to table}
 \usage{
 add_table_bottom(ftable, ffun = sum, fname = NA)
 }
@@ -20,7 +20,7 @@ E.g. fname = c(Object = 'Result'). Default value is NA.}
 data.frame or data.table
 }
 \description{
-Adds
+Adds bottom aggregation row to table
 }
 \examples{
 \dontrun{add_table_bottom(dt)}

@@ -1,4 +1,4 @@
-#' Adds
+#' Adds bottom aggregation row to table
 #'
 #' @param ftable data.frame or data.table
 #' @param ffun aggregation function such as sum, mean, etc.
