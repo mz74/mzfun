@@ -9,7 +9,8 @@ explore_table(
   ftarget = NA,
   fassign_classes = TRUE,
   fadd_plots = FALSE,
-  fmax_numlevels = 0
+  fprm_na = FALSE,
+  fpmax_numlevels = 0
 )
 }
 \arguments{
@@ -22,7 +23,9 @@ Optional. Use ftarget = NA to explore the table without target column.}
 
 \item{fadd_plots}{TRUE or FALSE. Add or not add a plot.}
 
-\item{fmax_numlevels}{Integer. If number of numeric is smaller, then plot
+\item{fprm_na}{TRUE or FALSE. Remove or not remove NAs before plotting.}
+
+\item{fpmax_numlevels}{Integer. If number of numerics is smaller, then plot
 bar plot instead of line plot.}
 }
 \value{

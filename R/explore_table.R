@@ -5,7 +5,8 @@
 #' Optional. Use ftarget = NA to explore the table without target column.
 #' @param fassign_classes TRUE or FALSE. TRUE assigns a new class to each column.
 #' @param fadd_plots TRUE or FALSE. Add or not add a plot.
-#' @param fmax_numlevels Integer. If number of numerics is smaller, then plot
+#' @param fprm_na TRUE or FALSE. Remove or not remove NAs before plotting.
+#' @param fpmax_numlevels Integer. If number of numerics is smaller, then plot
 #' bar plot instead of line plot.
 #'
 #' @return data.frame or data.table of the summary statistics.
@@ -20,7 +21,8 @@ explore_table = function(ftable,
                          ftarget = NA,
                          fassign_classes = TRUE,
                          fadd_plots = FALSE,
-                         fmax_numlevels = 0
+                         fprm_na = FALSE,
+                         fpmax_numlevels = 0
 ){
 
   # prepare
@@ -28,6 +30,7 @@ explore_table = function(ftable,
   x = NULL
   target = NULL
   count = NULL
+  . = NULL
 
   # store original class
   dclass = class(ftable[0])
@@ -102,22 +105,30 @@ explore_table = function(ftable,
   i = dcols[3]
   if (fadd_plots == TRUE){
     for (i in dcols){
-      ftable[get(i) == '', c(i) := NA]
+      # remove or not remove NAs
+      dftable = ftable[, .(x = get(i), dummy__target)]
+      if (fprm_na == TRUE){
+        dftable = dftable[!is.na(x)][x != ''][!is.na(dummy__target)][dummy__target != '']
+      }
+      dftable[x == '', c(i) := NA]
+
       if (class(ftable[[i]]) %in% c('numeric', 'integer')){
         dplotclass = 'numeric'
       } else {
         dplotclass = 'factor'
       }
-      dlevels = ftable[!is.na(get(i))][!duplicated(get(i)), .N]
 
-      if (dplotclass == 'numeric' & dlevels > fmax_numlevels){
-        dtab = ftable[, .(x = get(i), target = dummy__target)]
-        dplot_count = ggplot(data=dtab, aes(x, color=target)) + geom_density()
-        dplot_rel = ggplot(data=dtab, aes(x, color=target)) + geom_density()
+      dlevels = dftable[!is.na(x)][!duplicated(x), .N]
+
+      if (dplotclass == 'numeric' & dlevels > fpmax_numlevels){
+        dtab = dftable[, .(x, dummy__target)]
+
+        dplot_count = ggplot(data=dtab, aes(x, color=dummy__target)) + geom_density() + guides(color=guide_legend(ftarget))
+        dplot_rel = ggplot(data=dtab, aes(x, color=dummy__target)) + geom_density() + guides(color=guide_legend(ftarget))
         #print(i)
         #print(dplot_count)
       } else {
-        dtab = ftable[, .(count = .N), by=.(target = dummy__target, col=get(i))][, rel := count/sum(count), by=.(target)]
+        dtab = dftable[, .(count = .N), by=.(dummy__target, col=x)][, rel := count/sum(count), by=.(dummy__target)]
         if (dplotclass == 'numeric') {
           dtab = dtab[order(col)]
           dtab[, col := factor(col, levels = unique(dtab$col))]
@@ -125,15 +136,23 @@ explore_table = function(ftable,
           dtab = dtab[order(count)]
           dtab[, col := factor(col, levels = unique(dtab$col))]
         }
-        dplot_count = ggplot(data=dtab, aes(x=col, y=count, fill=target)) +
+        dplot_count = ggplot(data=dtab, aes(x=col, y=count, fill=dummy__target)) +
           geom_bar(stat='identity', position = position_dodge2()) +
-          coord_flip()
-        dplot_rel = ggplot(data=dtab, aes(x=col, y=rel, fill=target)) +
+          coord_flip()+ guides(fill=guide_legend(ftarget))
+        dplot_rel = ggplot(data=dtab, aes(x=col, y=rel, fill=dummy__target)) +
           geom_bar(stat='identity', position = position_dodge2()) +
-          coord_flip()
+          coord_flip() + guides(fill=guide_legend(ftarget))
       }
-      res$plot[[i]]$count = dplot_count + xlab(i) + theme_minimal()
-      res$plot[[i]]$rel = dplot_rel + xlab(i) + theme_minimal()
+      res$plot[[i]]$count = dplot_count + xlab(i) + theme_minimal() +
+        ggtitle(paste0(i, ' - absolute values'))
+      res$plot[[i]]$rel = dplot_rel + xlab(i) + theme_minimal()+
+        ggtitle(paste0(i, ' - relative values'))
+
+      # remove legende
+      if (is.na(ftarget)){
+        res$plot[[i]]$count = res$plot[[i]]$count + theme(legend.position = "none")
+        res$plot[[i]]$rel   = res$plot[[i]]$rel   + theme(legend.position = "none")
+      }
 
     }
   }
