@@ -2,4 +2,6 @@
 
 export(add_table_bottom)
 export(add_table_right)
+export(explore_table)
 import(data.table)
+import(ggplot2)

@@ -17,7 +17,7 @@
 add_table_bottom = function(ftable, ffun = sum, fname=NA){
 
   # store original class
-  dclass = class(ftable)
+  dclass = class(ftable[0])
 
   # data.table
   setDT(ftable)
