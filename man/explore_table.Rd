@@ -10,7 +10,8 @@ explore_table(
   fassign_classes = TRUE,
   fadd_plots = FALSE,
   fprm_na = FALSE,
-  fpmax_numlevels = 0
+  fpmax_numlevels = 0,
+  fpmax_faclevels = 50
 )
 }
 \arguments{
@@ -27,9 +28,14 @@ Optional. Use ftarget = NA to explore the table without target column.}
 
 \item{fpmax_numlevels}{Integer. If number of numerics is smaller, then plot
 bar plot instead of line plot.}
+
+\item{fpmax_faclevels}{Integer. Maximum number of bars to be plotted for each segment.}
 }
 \value{
-data.frame or data.table of the summary statistics.
+list with several elements:
+\emph{summary}: the summary statistics.
+\emph{plot$name$count}: ggplot of absolute frequencies of property \emph{name}.
+\emph{plot$name$rel}: ggplot of relative frequencies of property \emph{name}.
 }
 \description{
 Summary statistics and plots of the table columns.

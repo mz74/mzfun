@@ -13,12 +13,13 @@ install()
 
 
 # change readme.rmd and then
-build_readme()
+#build_readme()
 
 # test 'add_table_bottom'
 library(data.table)
 library(magrittr)
 library(ggplot2)
+library(mzfun)
 
 # add_table_right
 d1 = mtcars
@@ -36,6 +37,7 @@ fassign_classes = TRUE
 
 et1 = explore_table(copy(d3), ftarget = 'Anrede', fassign_classes = TRUE,
                     fadd_plots = TRUE, fpmax_numlevels = 20, fprm_na = TRUE)
+et1$summary
 et2 = explore_table(copy(d2), ftarget = 'Species', fadd_plots = TRUE, fmax_numlevels = 20)
 et3 = explore_table(copy(d1), ftarget = NA, fadd_plots = TRUE, fmax_numlevels = 20)
 
@@ -58,3 +60,7 @@ rowSums(x)
 colSums(x)
 x
 colSums(d1)
+
+
+stringi::stri_escape_unicode('ä')
+print(' - Bedingte H\u00e4ufigkeit je Segment')
