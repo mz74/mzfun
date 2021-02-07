@@ -42,6 +42,7 @@ explore_table = function(ftable,
   dclass = class(ftable[0])
 
   # data.table
+  ftable = copy(ftable)
   setDT(ftable)
 
   # columns to explore
@@ -87,20 +88,27 @@ explore_table = function(ftable,
     dexamples = ftable[!is.na(get(i))][!duplicated(get(i)), get(i)][1:(min(dlevels, 3))]
     dexamples = paste(dexamples, collapse = ', ')
     dempty  = ftable[is.na(get(i)) | get(i) == '', .N]
+    dempty_rel = 100*signif(dempty/dnumber, 3)
+       dempty_rel = format(dempty_rel, big.mark   = '.', decimal.mark = ',')
+       dempty_rel = paste0(dempty_rel, '%')
     dmean   = ''
     dmedian = ''
     if (class(ftable[[i]]) %in% c('numeric', 'integer')){
       dmean   = ftable[, mean(get(i), na.rm = TRUE)]
+      dmean   = ifelse(dmean >= 100, round(dmean, 0), signif(dmean, 3))
+      dmean   = format(dmean, big.mark   = '.', decimal.mark = ',')
       dmedian = ftable[, stats::median(get(i), na.rm = TRUE)]
+      dmedian   = ifelse(dmedian >= 100, round(dmedian, 0), signif(dmedian, 3))
+      dmedian   = format(dmedian, big.mark   = '.', decimal.mark = ',')
     }
     d1 = data.table(
       column = i,
       class  = class(ftable[[i]]),
-      number = dnumber,
-      levels = dlevels,
+      number = format(dnumber, big.mark   = '.', decimal.mark = ','),
+      levels = format(dlevels, big.mark   = '.', decimal.mark = ','),
       examples = dexamples,
-      `empty rows abs` = dempty,
-      `empty rows rel` = dempty / dnumber,
+      `empty rows abs` = format(dempty, big.mark   = '.', decimal.mark = ','),
+      `empty rows rel` = dempty_rel,
       mean = dmean,
       median = dmedian
     )
