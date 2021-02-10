@@ -147,16 +147,19 @@ explore_table = function(ftable,
         dtab = dftable[, .(x, dummy__target)]
         dmax = max(dtab$x, na.rm = TRUE)
         dmin = min(dtab$x, na.rm=TRUE)
-        dscale = dmax - dmin
-        dtab[, x2 := (x - dmin)/dscale]
-        dtab[, x3 := x2*fpmax_numlevels]
-        dtab[, xmin := floor(x3)]
-        dtab[, xmax := xmin+1]
-        dtab[, xmin := xmin*dscale/fpmax_numlevels + dmin]
-        dtab[, xmax := xmax*dscale/fpmax_numlevels + dmin]
-        dtab[, new_x := paste0(xmin, ' - ', xmax)]
-        d2levels = dtab[order(x)][!duplicated(new_x)][, new_x]
+        dpretty = pretty(dmin:dmax, n=fpmax_numlevels, min.n = fpmax_numlevels%/%2)
+        dtab[, new_x := cut(x, dpretty, include.lowest=TRUE)]
+
+        # order und levels
+        dtab = dtab[order(x)]
+        d2levels = unique(dtab$new_x)
+
         dftable = dtab[, .(x=factor(new_x, levels = d2levels), dummy__target)]
+      } else if (dplotclass == 'numeric') {
+        # define levels and order
+        dftable = dftable[order(x)]
+        d2levels = unique(dftable$x)
+        dftable[, x := factor(x, levels = d2levels)]
       }
 
       dtab1 = dftable[, .(Anzahl = .N), by=.(tar1 = x, tar2 = dummy__target)]
@@ -166,6 +169,13 @@ explore_table = function(ftable,
       #dtab3 = data.table::dcast(dtab1, tar1~tar2, value.var=c('Relativ'))
       #dtab4 = data.table::dcast(dtab1, tar1~tar2, value.var=c('Anteil'))
       dtab = dtab1[, .(Gesamt = sum(Anzahl)), by=.(tar1)][, Relativ := Gesamt/sum(Gesamt)]
+
+      # prepare order
+      # order
+      if (dplotclass == 'factor'){
+        dtab = dtab[order(Gesamt, decreasing = TRUE)]
+        dtab[, tar1 := factor(tar1, levels = unique(dtab$tar1))]
+      }
 
       # format
       dtab[, Gesamt := format(Gesamt, big.mark   = '.', decimal.mark = ',', trim=TRUE, justify = 'right')]
@@ -178,8 +188,13 @@ explore_table = function(ftable,
       if (!is.na(ftarget)){
         dtab = merge(dtab, dtab2, by='tar1')
       }
+
+      # rename cells
       dtab[dtab == 'NA - NA'] = ''
       dtab[dtab == 'NA'] = ''
+
+      # order
+      dtab = dtab[order(tar1)]
       names(dtab)[names(dtab) == 'tar1'] = i
       res$table[[i]] = dtab
     }
