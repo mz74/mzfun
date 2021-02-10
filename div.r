@@ -34,9 +34,10 @@ for (i in names(d3)){
 ftable = d3 %>% copy
 ftarget = 'Anrede'
 fassign_classes = TRUE
+fprm_na = FALSE
 
 et1 = explore_table(copy(d3), ftarget = 'Anrede', fassign_classes = TRUE,
-                    fadd_plots = TRUE, fpmax_numlevels = 20, fprm_na = TRUE)
+                    fadd_tables = TRUE, fpmax_numlevels = 20, fprm_na = FALSE)
 et1$summary
 et2 = explore_table(copy(d2), ftarget = 'Species', fadd_plots = TRUE, fmax_numlevels = 20)
 et3 = explore_table(copy(d1), ftarget = NA, fadd_plots = TRUE, fmax_numlevels = 20)

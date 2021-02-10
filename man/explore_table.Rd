@@ -8,6 +8,7 @@ explore_table(
   ftable,
   ftarget = NA,
   fassign_classes = TRUE,
+  fadd_tables = TRUE,
   fadd_plots = FALSE,
   fprm_na = FALSE,
   fpmax_numlevels = 0,
@@ -21,6 +22,8 @@ explore_table(
 Optional. Use ftarget = NA to explore the table without target column.}
 
 \item{fassign_classes}{TRUE or FALSE. TRUE assigns a new class to each column.}
+
+\item{fadd_tables}{TRUE or FALSE. Add or not add a table.}
 
 \item{fadd_plots}{TRUE or FALSE. Add or not add a plot.}
 

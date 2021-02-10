@@ -4,6 +4,7 @@
 #' @param ftarget string: columname of ftable including the target.
 #' Optional. Use ftarget = NA to explore the table without target column.
 #' @param fassign_classes TRUE or FALSE. TRUE assigns a new class to each column.
+#' @param fadd_tables TRUE or FALSE. Add or not add a table.
 #' @param fadd_plots TRUE or FALSE. Add or not add a plot.
 #' @param fprm_na TRUE or FALSE. Remove or not remove NAs before plotting.
 #' @param fpmax_numlevels Integer. If number of numerics is smaller, then plot
@@ -25,6 +26,7 @@
 explore_table = function(ftable,
                          ftarget = NA,
                          fassign_classes = TRUE,
+                         fadd_tables = TRUE,
                          fadd_plots = FALSE,
                          fprm_na = FALSE,
                          fpmax_numlevels = 0,
@@ -89,8 +91,8 @@ explore_table = function(ftable,
     dexamples = paste(dexamples, collapse = ', ')
     dempty  = ftable[is.na(get(i)) | get(i) == '', .N]
     dempty_rel = 100*signif(dempty/dnumber, 3)
-       dempty_rel = format(dempty_rel, big.mark   = '.', decimal.mark = ',')
-       dempty_rel = paste0(dempty_rel, '%')
+    dempty_rel = format(dempty_rel, big.mark   = '.', decimal.mark = ',')
+    dempty_rel = paste0(dempty_rel, '%')
     dmean   = ''
     dmedian = ''
     if (class(ftable[[i]]) %in% c('numeric', 'integer')){
@@ -118,9 +120,76 @@ explore_table = function(ftable,
   res = list(summary = dtable)
 
   # ----------------------------------------------------------------------
+  # tables
+  # ----------------------------------------------------------------------
+
+  i = dcols[2]
+  if (fadd_tables == TRUE){
+    for (i in dcols){
+
+      # remove or not remove NAs
+      dftable = ftable[, .(x = get(i), dummy__target)]
+      if (fprm_na == TRUE){
+        dftable = dftable[!is.na(x)][x != ''][!is.na(dummy__target)][dummy__target != '']
+      }
+      dftable[x == '', x := NA]
+
+      if (class(ftable[[i]]) %in% c('numeric', 'integer')){
+        dplotclass = 'numeric'
+      } else {
+        dplotclass = 'factor'
+      }
+
+      dlevels = dftable[!is.na(x)][!duplicated(x), .N]
+
+      # create steps
+      if (dplotclass == 'numeric' & dlevels > fpmax_numlevels){
+        dtab = dftable[, .(x, dummy__target)]
+        dmax = max(dtab$x, na.rm = TRUE)
+        dmin = min(dtab$x, na.rm=TRUE)
+        dscale = dmax - dmin
+        dtab[, x2 := (x - dmin)/dscale]
+        dtab[, x3 := x2*fpmax_numlevels]
+        dtab[, xmin := floor(x3)]
+        dtab[, xmax := xmin+1]
+        dtab[, xmin := xmin*dscale/fpmax_numlevels + dmin]
+        dtab[, xmax := xmax*dscale/fpmax_numlevels + dmin]
+        dtab[, new_x := paste0(xmin, ' - ', xmax)]
+        d2levels = dtab[order(x)][!duplicated(new_x)][, new_x]
+        dftable = dtab[, .(x=factor(new_x, levels = d2levels), dummy__target)]
+      }
+
+      dtab1 = dftable[, .(Anzahl = .N), by=.(tar1 = x, tar2 = dummy__target)]
+      #dtab1 = dtab1[, ':=' (Relativ = Anzahl/sum(Anzahl)), by=.(tar2)]
+      #dtab1 = dtab1[, ':=' (Anteil = Anzahl/sum(Anzahl)), by=.(tar1)]
+      dtab2 = data.table::dcast(dtab1, tar1~tar2, value.var=c('Anzahl'))
+      #dtab3 = data.table::dcast(dtab1, tar1~tar2, value.var=c('Relativ'))
+      #dtab4 = data.table::dcast(dtab1, tar1~tar2, value.var=c('Anteil'))
+      dtab = dtab1[, .(Gesamt = sum(Anzahl)), by=.(tar1)][, Relativ := Gesamt/sum(Gesamt)]
+
+      # format
+      dtab[, Gesamt := format(Gesamt, big.mark   = '.', decimal.mark = ',', trim=TRUE, justify = 'right')]
+      dtab[, Relativ := format(signif(100*Relativ, 3), big.mark   = '.', decimal.mark = ',', trim=TRUE, justify = 'right')]
+      dtab[, Relativ := paste0(Relativ, '%')]
+
+      d2cols = names(dtab2)[-1]
+      dtab2[, c(d2cols) := lapply(.SD, function(x) {format(x, big.mark   = '.', decimal.mark = ',', trim=TRUE, justify = 'right')}), .SDcols = d2cols]
+
+      if (!is.na(ftarget)){
+        dtab = merge(dtab, dtab2, by='tar1')
+      }
+      dtab[dtab == 'NA - NA'] = ''
+      dtab[dtab == 'NA'] = ''
+      names(dtab)[names(dtab) == 'tar1'] = i
+      res$table[[i]] = dtab
+    }
+
+  }
+
+  # ----------------------------------------------------------------------
   # plots
   # ----------------------------------------------------------------------
-  i = dcols[3]
+  #i = dcols[3]
   if (fadd_plots == TRUE){
     for (i in dcols){
       # remove or not remove NAs
@@ -128,7 +197,7 @@ explore_table = function(ftable,
       if (fprm_na == TRUE){
         dftable = dftable[!is.na(x)][x != ''][!is.na(dummy__target)][dummy__target != '']
       }
-      dftable[x == '', c(i) := NA]
+      dftable[x == '', x := NA]
 
       if (class(ftable[[i]]) %in% c('numeric', 'integer')){
         dplotclass = 'numeric'
