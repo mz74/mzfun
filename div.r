@@ -29,6 +29,8 @@ for (i in names(d3)){
   d3[sample(c(1:.N), 1000), c(i) := NA]
   d3[sample(c(1:.N), 1000), c(i) := '']
 }
+d3 = d3[, id := id %>% as.numeric()]
+d3 = d3[, id := id / 15000]
 
 # test explore_table
 ftable = d3 %>% copy
@@ -40,6 +42,9 @@ fpmax_numlevels = 20
 et1 = explore_table(copy(d3), ftarget = 'Anrede', fassign_classes = TRUE,
                     fadd_tables = TRUE, fpmax_numlevels = 20, fprm_na = FALSE)
 et1$table
+
+et1 = explore_table(copy(d3), ftarget = 'Anrede', fassign_classes = TRUE, fadd_tables = TRUE, fadd_plots = TRUE, fpmax_numlevels = 20, fprm_na = FALSE, fpmax_faclevels = 50)
+
 et2 = explore_table(copy(d2), ftarget = 'Species', fadd_plots = TRUE, fmax_numlevels = 20)
 et3 = explore_table(copy(d1), ftarget = NA, fadd_plots = TRUE, fmax_numlevels = 20)
 

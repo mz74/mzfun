@@ -123,7 +123,7 @@ explore_table = function(ftable,
   # tables
   # ----------------------------------------------------------------------
 
-  i = dcols[2]
+  i = dcols[1]
   if (fadd_tables == TRUE){
     for (i in dcols){
 
@@ -147,7 +147,8 @@ explore_table = function(ftable,
         dtab = dftable[, .(x, dummy__target)]
         dmax = max(dtab$x, na.rm = TRUE)
         dmin = min(dtab$x, na.rm=TRUE)
-        dpretty = pretty(dmin:dmax, n=fpmax_numlevels, min.n = fpmax_numlevels%/%2)
+        dpretty = pretty(c(dmin, dmax), n=fpmax_numlevels,
+                         min.n = fpmax_numlevels%/%2)
         dtab[, new_x := cut(x, dpretty, include.lowest=TRUE)]
 
         # order und levels
