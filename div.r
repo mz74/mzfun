@@ -30,16 +30,16 @@ for (i in names(d3)){
   d3[sample(c(1:.N), 1000), c(i) := '']
 }
 d3 = d3[, id := id %>% as.numeric()]
-d3 = d3[, id := id / 15000]
+d33 = d3[, id := id / 15000]
 
 # test explore_table
-ftable = d3 %>% copy
+ftable = d33 %>% copy
 ftarget = 'Anrede'
 fassign_classes = TRUE
 fprm_na = FALSE
 fpmax_numlevels = 20
 
-et1 = explore_table(copy(d3), ftarget = 'Anrede', fassign_classes = TRUE,
+et1 = explore_table(copy(d33), ftarget = 'Anrede', fassign_classes = TRUE,
                     fadd_tables = TRUE, fpmax_numlevels = 20, fprm_na = FALSE)
 et1$table
 

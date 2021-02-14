@@ -30,14 +30,23 @@ explore_table = function(ftable,
                          fadd_plots = FALSE,
                          fprm_na = FALSE,
                          fpmax_numlevels = 0,
-                         fpmax_faclevels = 50
+                         fpmax_faclevels = 20
 ){
 
   # prepare
   dummy__target = NULL
-  x = NULL
-  target = NULL
-  count = NULL
+  x             = NULL
+  new_x         = NULL
+  target        = NULL
+  count         = NULL
+
+  Anzahl        = NULL
+  Anteil        = NULL
+  Absolut       = NULL
+  Relativ       = NULL
+  tar1          = NULL
+  tar2          = NULL
+
   . = NULL
 
   # store original class
@@ -134,12 +143,15 @@ explore_table = function(ftable,
       }
       dftable[x == '', x := NA]
 
+      # is it numeric or factor ??
       if (class(ftable[[i]]) %in% c('numeric', 'integer')){
         dplotclass = 'numeric'
       } else {
         dplotclass = 'factor'
+        dftable[is.na(x), x := 'NA']  # new level
       }
 
+      # nb of levels
       dlevels = dftable[!is.na(x)][!duplicated(x), .N]
 
       # create steps
@@ -152,6 +164,7 @@ explore_table = function(ftable,
         dtab[, new_x := cut(x, dpretty, include.lowest=TRUE)]
 
         # order und levels
+        dtab[is.na(new_x), new_x := 'NA']
         dtab = dtab[order(x)]
         d2levels = unique(dtab$new_x)
 
@@ -159,40 +172,77 @@ explore_table = function(ftable,
       } else if (dplotclass == 'numeric') {
         # define levels and order
         dftable = dftable[order(x)]
+        dftable[, x := as.character(x)]
+        dftable[is.na(x), x := 'NA']
         d2levels = unique(dftable$x)
         dftable[, x := factor(x, levels = d2levels)]
       }
 
       dtab1 = dftable[, .(Anzahl = .N), by=.(tar1 = x, tar2 = dummy__target)]
-      #dtab1 = dtab1[, ':=' (Relativ = Anzahl/sum(Anzahl)), by=.(tar2)]
-      #dtab1 = dtab1[, ':=' (Anteil = Anzahl/sum(Anzahl)), by=.(tar1)]
+      dtab1 = dtab1[, ':=' (Relativ = Anzahl/sum(Anzahl)), by=.(tar2)]
+      dtab1 = dtab1[, ':=' (Anteil = Anzahl/sum(Anzahl)), by=.(tar1)]
+
+      # Abs je Segment
       dtab2 = data.table::dcast(dtab1, tar1~tar2, value.var=c('Anzahl'))
       #dtab3 = data.table::dcast(dtab1, tar1~tar2, value.var=c('Relativ'))
-      #dtab4 = data.table::dcast(dtab1, tar1~tar2, value.var=c('Anteil'))
-      dtab = dtab1[, .(Gesamt = sum(Anzahl)), by=.(tar1)][, Relativ := Gesamt/sum(Gesamt)]
 
-      # prepare order
-      # order
+      # Anteil je Segment
+      dtab3 = data.table::dcast(dtab1, tar1~tar2, value.var=c('Relativ'))
+
+      # Anteil je Segment
+      dtab4 = data.table::dcast(dtab1, tar1~tar2, value.var=c('Anteil'))
+
+      # Abs and Rel overal
+      dtab = dtab1[, .(Absolut = sum(Anzahl)), by=.(tar1)][, Relativ := Absolut/sum(Absolut)]
+
+      # for ordering
       if (dplotclass == 'factor'){
-        dtab = dtab[order(Gesamt, decreasing = TRUE)]
+        dtab = dtab[order(Absolut, decreasing = TRUE)]
         dtab[, tar1 := factor(tar1, levels = unique(dtab$tar1))]
       }
 
+      # add gesamt
+      dtab  = add_table_bottom(dtab,  ffun = sum, fname = c(tar1 = 'Gesamt'))
+      dtab2 = add_table_bottom(dtab2, ffun = sum, fname = c(tar1 = 'Gesamt'))
+      dtab3 = add_table_bottom(dtab3, ffun = sum, fname = c(tar1 = 'Gesamt'))
+
+      # add gesamt to Anteile
+      d1 = dftable[, .(tar1 = 'Gesamt', Anzahl = .N), by=.(tar2 = dummy__target)]
+      d1[, Anteil := Anzahl/sum(Anzahl)]
+      d1 = data.table::dcast(d1, tar1~tar2, value.var=c('Anteil'))
+      dtab4 = rbind(dtab4, d1)
+
+      # rename
+      names(dtab3)[-1] = paste0(names(dtab3)[-1], ' Relativ')
+      names(dtab4)[-1] = paste0(names(dtab4)[-1], ' Anteil')
+      # prepare order
+      # order
+
       # format
-      dtab[, Gesamt := format(Gesamt, big.mark   = '.', decimal.mark = ',', trim=TRUE, justify = 'right')]
+      dtab[, Absolut := format(Absolut, big.mark   = '.', decimal.mark = ',', trim=TRUE, justify = 'right')]
       dtab[, Relativ := format(signif(100*Relativ, 3), big.mark   = '.', decimal.mark = ',', trim=TRUE, justify = 'right')]
       dtab[, Relativ := paste0(Relativ, '%')]
 
+      ## for Segments
       d2cols = names(dtab2)[-1]
       dtab2[, c(d2cols) := lapply(.SD, function(x) {format(x, big.mark   = '.', decimal.mark = ',', trim=TRUE, justify = 'right')}), .SDcols = d2cols]
 
+      ## for Relativ
+      d2cols = names(dtab3)[-1]
+      dtab3[, c(d2cols) := lapply(.SD, function(x) {format(signif(100*x, 3), big.mark   = '.', decimal.mark = ',', trim=TRUE, justify = 'right')}), .SDcols = d2cols]
+      dtab3[, c(d2cols) := lapply(.SD, function(x) {paste0(x, '%')}), .SDcols = d2cols]
+
+      ## for Anteile
+      d2cols = names(dtab4)[-1]
+      dtab4[, c(d2cols) := lapply(.SD, function(x) {format(signif(100*x, 3), big.mark   = '.', decimal.mark = ',', trim=TRUE, justify = 'right')}), .SDcols = d2cols]
+      dtab4[, c(d2cols) := lapply(.SD, function(x) {paste0(x, '%')}), .SDcols = d2cols]
+
+
       if (!is.na(ftarget)){
         dtab = merge(dtab, dtab2, by='tar1')
+        dtab = merge(dtab, dtab3, by='tar1')
+        dtab = merge(dtab, dtab4, by='tar1')
       }
-
-      # rename cells
-      dtab[dtab == 'NA - NA'] = ''
-      dtab[dtab == 'NA'] = ''
 
       # order
       dtab = dtab[order(tar1)]

@@ -12,7 +12,7 @@ explore_table(
   fadd_plots = FALSE,
   fprm_na = FALSE,
   fpmax_numlevels = 0,
-  fpmax_faclevels = 50
+  fpmax_faclevels = 20
 )
 }
 \arguments{
