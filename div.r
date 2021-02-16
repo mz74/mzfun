@@ -40,7 +40,9 @@ fprm_na = FALSE
 fpmax_numlevels = 20
 
 et1 = explore_table(copy(d33), ftarget = 'Anrede', fassign_classes = TRUE,
-                    fadd_tables = TRUE, fpmax_numlevels = 20, fprm_na = FALSE)
+                    fadd_tables = TRUE, fpmax_numlevels = 20, fprm_na = FALSE,
+                    fadd_plots = TRUE, fptext_labels = TRUE)
+et1$plot
 et1$table
 
 et1 = explore_table(copy(d3), ftarget = 'Anrede', fassign_classes = TRUE, fadd_tables = TRUE, fadd_plots = TRUE, fpmax_numlevels = 20, fprm_na = FALSE, fpmax_faclevels = 50)
@@ -71,3 +73,11 @@ colSums(d1)
 
 stringi::stri_escape_unicode('ä')
 print(' - Bedingte H\u00e4ufigkeit je Segment')
+
+# about signigy
+library(data.table)
+b1 = data.table(A = c(0.3472343, 0.00234))
+b1[, b2 := signif(b1, 3)]
+b1[, b3 := as.character(b2)]
+
+

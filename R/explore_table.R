@@ -7,6 +7,7 @@
 #' @param fadd_tables TRUE or FALSE. Add or not add a table.
 #' @param fadd_plots TRUE or FALSE. Add or not add a plot.
 #' @param fprm_na TRUE or FALSE. Remove or not remove NAs before plotting.
+#' @param fptext_labels TRUE or FALSE. Add or not add text labels to bar plots.
 #' @param fpmax_numlevels Integer. If number of numerics is smaller, then plot
 #' bar plot instead of line plot.
 #' @param fpmax_faclevels Integer. Maximum number of bars to be plotted for each segment.
@@ -29,6 +30,7 @@ explore_table = function(ftable,
                          fadd_tables = TRUE,
                          fadd_plots = FALSE,
                          fprm_na = FALSE,
+                         fptext_labels = FALSE,
                          fpmax_numlevels = 0,
                          fpmax_faclevels = 20
 ){
@@ -46,6 +48,11 @@ explore_table = function(ftable,
   Relativ       = NULL
   tar1          = NULL
   tar2          = NULL
+
+  text1         = NULL
+  text2         = NULL
+  pos1          = NULL
+  pos2          = NULL
 
   . = NULL
 
@@ -285,14 +292,16 @@ explore_table = function(ftable,
           scale_y_continuous(labels = function(x) format(x, big.mark = '.', decimal.mark = ',')) +
           scale_x_continuous(labels = function(x) format(x, big.mark = '.', decimal.mark = ',')) +
           ggtitle(paste0(i, ' - Absolute H\u00e4ufigkeiten')) +
-          scale_fill_hue(c=50, l= 60, h=c(60, 220))
+          scale_fill_hue(c=50, l= 60, h=c(60, 220)) +
+          theme_minimal()
 
         dplot_rel = ggplot(data=dtab, aes(x, color=dummy__target)) + geom_density() +
           guides(color=guide_legend(ftarget))+ ylab('Dichte') +
-          scale_y_continuous(breaks = NULL) +
+          scale_y_continuous(breaks = c(0)) +
           scale_x_continuous(labels = function(x) format(x, big.mark = '.', decimal.mark = ',')) +
           ggtitle(paste0(i, ' - Dichteverteilung je Segment')) +
-          scale_color_hue(c=50, l= 60, h=c(60, 220))
+          scale_color_hue(c=50, l= 60, h=c(60, 220)) +
+          theme_minimal()
       } else {
         dtab = dftable[, .(count = .N), by=.(dummy__target, col=x)][, rel := count/sum(count), by=.(dummy__target)]
         # reduce number of levels
@@ -317,23 +326,62 @@ explore_table = function(ftable,
           dtab = dtab[order(count)]
           dtab[, col := factor(col, levels = unique(dtab$col))]
         }
+        # add text and position
+        dtab[, text1 := format(count, big.mark = '.', decimal.mark = ',', trim=TRUE, justify='left')]
+        dtab[, pos1  := 0.01*max(dtab$count, na.rm=TRUE)]
+        dtab[, text2 := signif(100*rel, 3)]
+        dtab[, text2 := format(text2, big.mark = '.', decimal.mark = ',', drop0trailing = TRUE, trim=TRUE, justify='left')]
+        dtab[, text2 := paste0(text2, '%')]
+        dtab[, pos2  := 0.01*max(dtab$rel, na.rm=TRUE)]
+
+        # plot
         dplot_count = ggplot(data=dtab, aes(x=col, y=count, fill=dummy__target)) +
           geom_bar(stat='identity', position = position_dodge2()) +
           coord_flip()+ guides(fill=guide_legend(ftarget)) + ylab('Anzahl') +
           scale_y_continuous(labels = function(x) format(x, big.mark = '.', decimal.mark = ',')) +
           ggtitle(paste0(i, ' - Absolute H\u00e4ufigkeiten')) +
-          scale_fill_hue(c=50, l= 60, h=c(60, 220))
+          scale_fill_hue(c=50, l= 60, h=c(60, 220)) +
+          theme_minimal() +
+          theme(panel.grid.major.y = element_blank())
+
+        if (fptext_labels == TRUE){
+          dplot_count = dplot_count +
+            geom_text(aes(label = text1, y=pos1),
+                      position=position_dodge2(width = 0.9),
+                      hjust = 0,
+                      color = '#E0E0E0',
+                      size = 3) +
+            theme(panel.grid.major.x = element_blank()) +
+            theme(panel.grid.minor.x = element_blank()) +
+            theme(axis.text.x = element_blank())
+        }
+
+
 
         dplot_rel = ggplot(data=dtab, aes(x=col, y=rel, fill=dummy__target)) +
           geom_bar(stat='identity', position = position_dodge2()) +
           coord_flip() + guides(fill=guide_legend(ftarget)) + ylab('Anteil') +
           scale_y_continuous(labels = function(x) paste0(format(100*x, big.mark = '.', decimal.mark = ','), '%')) +
           ggtitle(paste0(i, ' - Bedingte H\u00e4ufigkeiten je Segment'))+
-          scale_fill_hue(c=50, l= 60, h=c(60, 220))
+          scale_fill_hue(c=50, l= 60, h=c(60, 220)) +
+          theme_minimal() +
+          theme(panel.grid.major.y = element_blank())
+
+        if (fptext_labels == TRUE){
+          dplot_rel = dplot_rel +
+            geom_text(aes(label = text2, y=pos2),
+                      position=position_dodge2(width = 0.9),
+                      hjust = 0,
+                      color = '#E0E0E0',
+                      size = 3) +
+            theme(panel.grid.major.x = element_blank()) +
+            theme(panel.grid.minor.x = element_blank()) +
+            theme(axis.text.x = element_blank())
+        }
 
       }
-      res$plot[[i]]$count = dplot_count + xlab(i) + theme_minimal()
-      res$plot[[i]]$rel = dplot_rel + xlab(i) + theme_minimal()
+      res$plot[[i]]$count = dplot_count + xlab(i)
+      res$plot[[i]]$rel = dplot_rel + xlab(i)
 
       # remove legende
       if (is.na(ftarget)){

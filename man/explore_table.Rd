@@ -11,6 +11,7 @@ explore_table(
   fadd_tables = TRUE,
   fadd_plots = FALSE,
   fprm_na = FALSE,
+  fptext_labels = FALSE,
   fpmax_numlevels = 0,
   fpmax_faclevels = 20
 )
@@ -28,6 +29,8 @@ Optional. Use ftarget = NA to explore the table without target column.}
 \item{fadd_plots}{TRUE or FALSE. Add or not add a plot.}
 
 \item{fprm_na}{TRUE or FALSE. Remove or not remove NAs before plotting.}
+
+\item{fptext_labels}{TRUE or FALSE. Add or not add text labels to bar plots.}
 
 \item{fpmax_numlevels}{Integer. If number of numerics is smaller, then plot
 bar plot instead of line plot.}
