@@ -1,6 +1,9 @@
 library(devtools)
 
 #use_package('ggplot2')
+#use_package('echarts4r')
+#use_package('magrittr')
+#use_package('htmlwidgets')
 document()
 load_all()
 check()
@@ -9,7 +12,7 @@ install()
 #use_r('add_table_bottom')
 #use_r('add_table_right')
 #use_r('explore_table')
-
+#use_r('plot_ecbar')
 
 
 # change readme.rmd and then
@@ -19,12 +22,46 @@ install()
 library(data.table)
 library(magrittr)
 library(ggplot2)
+library(echarts4r)
 library(mzfun)
 
 # add_table_right
 d1 = mtcars
 d2 = iris
+
+tab2 = (d2 %>% setDT)[, .(mean1 = mean(Petal.Width)), by=.(Species)]
+tab2[, color2 := 'grey'][1, color2 := 'blue']
+dp = list(NULL)
+dp$data = tab2
+dp$xval = 'Species'
+dp$yval = 'mean1'
+dp$color = 'color2'
+dp$text_format = 'euro'
+dp$margin_left = '12%'
+mp = plot_ecbar(dp)
+
+mp
+
+locales = system("locale -a", intern = TRUE) %>% data.table()
+
 d3 = '/home/mz/mz/datascience/20_create_data/test_data.txt' %>% fread(colClasses = 'character')
+d33 = d3[, .(Anzahl = .N), by=.(Milieu, Anrede)]
+d33[, color := 'grey'][1, color := 'blue']
+d33 = d33[order(Anzahl)]
+dp = list(NULL)
+dp$data = d33
+dp$xval = 'Milieu'
+dp$yval = 'Anzahl'
+dp$group = 'Anrede'
+#dp$color = 'color2'
+#dp$text_format = 'euro'
+dp$margin_left = '15%'
+dp$title = 'Chart'
+dp$legend = 'blue'
+mp = plot_ecbar(dp)
+
+mp
+
 for (i in names(d3)){
   d3[sample(c(1:.N), 1000), c(i) := NA]
   d3[sample(c(1:.N), 1000), c(i) := '']

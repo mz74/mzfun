@@ -16,4 +16,7 @@ RoxygenNote: 7.1.0
 Imports: 
     data.table,
     stats,
-    ggplot2
+    ggplot2,
+    echarts4r,
+    magrittr,
+    htmlwidgets

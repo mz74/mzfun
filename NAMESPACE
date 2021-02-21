@@ -3,5 +3,8 @@
 export(add_table_bottom)
 export(add_table_right)
 export(explore_table)
+export(plot_ecbar)
 import(data.table)
+import(echarts4r)
 import(ggplot2)
+importFrom(magrittr,"%>%")
