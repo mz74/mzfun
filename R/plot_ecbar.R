@@ -8,6 +8,10 @@
 #' \item yval = 'y': column name with y-values
 #' \item group = 'group': column name for grouping (not needed)
 #' \item color = 'color': column name with color-values
+#' \item label_color = '#A9A9A9': color of text labels
+#' \item x_label_color = '#606060': color of x-axis text labels
+#' \item label_size = 10: size of text labels
+#' \item x_label_size = 15: size of x-axis text labels
 #' \item margin_left = '10%': chart margin left
 #' \item margin_right = '12': chart margin right
 #' \item text_format = '': text format is '' (standard), 'percent', or 'euro'
@@ -33,6 +37,10 @@
 #' dp$group = 'group'
 #' dp$color = 'color'
 #' dp$text_format = ''
+#' dp$label_color = '#A9A9A9'
+#' dp$label_size = 10
+#' dp$x_label_color = '#606060'
+#' dp$x_label_size = 15
 #' dp$margin_left = '10%'
 #' dp$margin_right = '12'
 #' dp$title = 'Chart'
@@ -44,6 +52,7 @@
 plot_ecbar = function(dp = NULL){
 
   color = NULL
+  group = NULL
 
 
 
@@ -74,6 +83,11 @@ plot_ecbar = function(dp = NULL){
   margin_right = ifelse('margin_right' %in% names(dp), dp$margin_right, '12')  # y-col
   # text format
   text_format = ifelse('text_format' %in% names(dp), dp$text_format, '')
+  # label color
+  label_color = ifelse('label_color' %in% names(dp), dp$label_color, '#A9A9A9')
+  label_size  = ifelse('label_size'  %in% names(dp), dp$label_size, 10)
+  x_label_color = ifelse('x_label_color' %in% names(dp), dp$x_label_color, '#606060')
+  x_label_size  = ifelse('x_label_size'  %in% names(dp), dp$x_label_size, 15)
 
   names(tab)[names(tab) == xval] = 'xval'
   names(tab)[names(tab) == yval] = 'yval'
@@ -103,6 +117,7 @@ plot_ecbar = function(dp = NULL){
     let h = params.seriesName;
     return g + '<br>' +h+': '+f+'%';}"
   }
+
   if (text_format == 'euro'){
     js_numform = "function (params) {
     let f= Intl.NumberFormat('de-DE').format(params.value[0]);
@@ -123,14 +138,12 @@ plot_ecbar = function(dp = NULL){
     e_bar(yval) %>%
     e_color(color = tab$color) %>%
     e_add("itemStyle", color) %>%
-
-
-    e_labels(position = 'right', fontSize = 10,
+    e_labels(position = 'right', fontSize = label_size, color=label_color,
              formatter = htmlwidgets::JS(js_numform)) %>%
-    e_x_axis(type = "category", axisLabel = list(fontSize=15)) %>%
+    e_x_axis(type = "category", axisLabel = list(fontSize=x_label_size, color=x_label_color)) %>%
     e_y_axis(show=FALSE) %>%
     e_flip_coords() %>%
-    e_text_style(fontSize = 10, color='grey') %>%
+    #e_text_style(fontSize = 30, color='blue') %>%
     e_toolbox_feature(feature = "saveAsImage") %>%
     #  e_toolbox_feature(feature = "dataView") %>%
     e_tooltip(formatter = htmlwidgets::JS(js_ttform))
@@ -141,7 +154,7 @@ plot_ecbar = function(dp = NULL){
   }
   # Legend
   if ('legend' %in% names(dp)){
-    fplot = fplot %>% e_legend(show = dp$legend)
+    fplot = fplot %>% e_legend(show = dp$legend, right = '10%')
   } else {
     fplot = fplot %>% e_legend(show = FALSE)
   }

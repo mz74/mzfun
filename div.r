@@ -45,21 +45,22 @@ mp
 locales = system("locale -a", intern = TRUE) %>% data.table()
 
 d3 = '/home/mz/mz/datascience/20_create_data/test_data.txt' %>% fread(colClasses = 'character')
-d33 = d3[, .(Anzahl = .N), by=.(Milieu, Anrede)]
+d33 = d3[, .(Anzahl = .N), by=.(Milieu, Wohnart)]
 d33[, color := 'grey'][1, color := 'blue']
 d33 = d33[order(Anzahl)]
 dp = list(NULL)
 dp$data = d33
 dp$xval = 'Milieu'
 dp$yval = 'Anzahl'
-dp$group = 'Anrede'
+dp$group = 'Wohnart'
 #dp$color = 'color2'
 #dp$text_format = 'euro'
-dp$margin_left = '15%'
+dp$margin_left = '100'
 dp$title = 'Chart'
 dp$legend = 'blue'
-mp = plot_ecbar(dp)
+dp$label_size = '10'
 
+mp = plot_ecbar(dp)
 mp
 
 for (i in names(d3)){
