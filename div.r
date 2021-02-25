@@ -13,7 +13,7 @@ install()
 #use_r('add_table_right')
 #use_r('explore_table')
 #use_r('plot_ecbar')
-
+use_r('plot_ecscatter')
 
 # change readme.rmd and then
 #build_readme()
@@ -39,7 +39,26 @@ dp$color = 'color2'
 dp$text_format = 'euro'
 dp$margin_left = '12%'
 mp = plot_ecbar(dp)
+mp
 
+tab3 = (d2 %>% setDT)[, id := .N %>% seq]
+dcols = names(tab3) %>% setdiff('Species')
+tab3[, c(dcols) := lapply(.SD, as.numeric), .SDcols = c(dcols)]
+dp = list(NULL)
+dp$data = tab3
+dp$xval = 'id'
+dp$yval = 'Petal.Length'
+dp$group = 'Species'
+dp$text_format = ''
+dp$margin_right = '12%'
+dp$legend = TRUE
+#dp$xaxis_title = 'Holla'
+dp$yaxis_title = NA
+dp$show_xgrid = TRUE
+dp$show_ygrid = TRUE
+dp$title = 'ein neues Chart'
+dp$color = c('#b4943e', '#777acd', '#60a862', '#c45ca2', '#cb5a4c')
+mp = plot_ecscatter(dp)
 mp
 
 locales = system("locale -a", intern = TRUE) %>% data.table()
