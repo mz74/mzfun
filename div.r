@@ -13,7 +13,7 @@ install()
 #use_r('add_table_right')
 #use_r('explore_table')
 #use_r('plot_ecbar')
-#use_r('plot_eclollipop')
+#use_r('plot_ecdots')
 
 # change readme.rmd and then
 #build_readme()
@@ -96,6 +96,28 @@ dp$xaxis_title = 'Altersklasse'
 #mp = plot_ecbar(dp)
 mp = plot_eclollipop(dp)
 mp
+
+
+# dot plot
+d3 = '/home/mz/mz/datascience/20_create_data/test_data.txt' %>% fread(colClasses = 'character')
+d33 = d3[, .(Gehalt = Gehalt %>% as.numeric %>% mean), by=.(Altersklasse, Milieu)]
+d33[, color := 'grey'][Altersklasse == '5', color := 'blue']
+dp = list(NULL)
+dp$data = d33
+dp$xval = 'Milieu'
+dp$yval = 'Gehalt'
+dp$group = 'Altersklasse'
+dp$color = 'color'
+dp$pointsize = 15
+dp$text_format = 'euro'
+#dp$line_color = 'green'
+dp$linesize = 0.1
+#dp$show_line = FALSE
+dp$label_position = 'top'
+
+mp = plot_ecdot(dp)
+mp
+
 
 for (i in names(d3)){
   d3[sample(c(1:.N), 1000), c(i) := NA]
