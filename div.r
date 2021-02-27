@@ -13,7 +13,7 @@ install()
 #use_r('add_table_right')
 #use_r('explore_table')
 #use_r('plot_ecbar')
-use_r('plot_ecscatter')
+#use_r('plot_eclollipop')
 
 # change readme.rmd and then
 #build_readme()
@@ -31,6 +31,7 @@ d2 = iris
 
 tab2 = (d2 %>% setDT)[, .(mean1 = mean(Petal.Width)), by=.(Species)]
 tab2[, color2 := 'grey'][1, color2 := 'blue']
+dt1 = (tab2 %>% copy)[, key := paste0('k', (.N %>% seq))][, mean2 := mean1 %>% copy]
 dp = list(NULL)
 dp$data = tab2
 dp$xval = 'Species'
@@ -38,8 +39,11 @@ dp$yval = 'mean1'
 dp$color = 'color2'
 dp$text_format = 'euro'
 dp$margin_left = '12%'
-mp = plot_ecbar(dp)
+dp$pointsize = 35
+dp$linesize = 5
+mp = plot_eclollipop(dp)
 mp
+
 
 tab3 = (d2 %>% setDT)[, id := .N %>% seq]
 dcols = names(tab3) %>% setdiff('Species')
@@ -64,22 +68,33 @@ mp
 locales = system("locale -a", intern = TRUE) %>% data.table()
 
 d3 = '/home/mz/mz/datascience/20_create_data/test_data.txt' %>% fread(colClasses = 'character')
-d33 = d3[, .(Anzahl = .N), by=.(Milieu, Wohnart)]
+#d33 = d3[, .(Anzahl = .N), by=.(Milieu, Wohnart)]
+d33 = d3[, .(Anzahl = .N), by=.(Alter)]
 d33[, color := 'grey'][1, color := 'blue']
-d33 = d33[order(Anzahl)]
+#d33[Alter == '11', Anzahl := -545]
+d33 = d33[order(Alter %>% as.numeric)]
 dp = list(NULL)
 dp$data = d33
-dp$xval = 'Milieu'
+dp$xval = 'Alter'
 dp$yval = 'Anzahl'
-dp$group = 'Wohnart'
+#dp$group = NULL
 #dp$color = 'color2'
 #dp$text_format = 'euro'
 dp$margin_left = '100'
 dp$title = 'Chart'
 dp$legend = 'blue'
+dp$label_color = NULL
 dp$label_size = '10'
+dp$show_label = FALSE
+dp$pointsize = 10
+dp$label_position = 'out'
+dp$show_ygrid = TRUE
+dp$show_xaxis_line = TRUE
+dp$show_yaxis = TRUE
+dp$xaxis_title = 'Altersklasse'
 
-mp = plot_ecbar(dp)
+#mp = plot_ecbar(dp)
+mp = plot_eclollipop(dp)
 mp
 
 for (i in names(d3)){

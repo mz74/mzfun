@@ -1,4 +1,4 @@
-#' Interactive Line and Scatter Plot
+#' Interactive Lollipop Plot
 #'
 #' @param dp List of parameters
 #'
@@ -6,19 +6,22 @@
 #' \item tab: table to be plotted, already aggregated
 #' \item xval = 'x': column name with x-values
 #' \item yval = 'y': column name with y-values
-#' \item group = 'group': column name for grouping (not needed)
-#' \item color = NULL: color vector
+#' \item color = 'color': column name with colors
 #' \item pointsize = 8: symbol size
 #' \item linesize = 2: line width of line plot
 #' \item title: chart title
 #' \item text_format = '': text format is '' (standard), 'percent', or 'euro'
-#' \item show_legend = FALSE: show legend (TRUE/FALSE)
-#' \item show_label = FALSE: show text labels (TRUE/FALSE)
+#' \item show_label = TRUE: show text labels (TRUE/FALSE)
 #' \item label_color = '#A9A9A9': color of text labels
 #' \item label_size = 10: size of text labels
-#' \item ax_label_color = '#606060': color of axes text labels
-#' \item ax_label_size = 10: size of axes text labels
-#' \item xaxis_title = xval: name of x-axis title (string), set NA to remove it
+#' \item label_position = 'out': position of text labels ('out', 'left', 'right', 'inside', 'top', 'bottom')
+#' \item x_label_color = '#606060': color of x-axes text labels
+#' \item x_label_size = 15: size of x-axes text labels
+#' \item y_label_color = '#606060': color of y-axes text labels
+#' \item y_label_size = 10: size of y-axes text labels
+#' \item xaxis_title = '': name of x-axis title (string), set NA to remove it
+#' \item show_xaxis_line = FALSE: show (vertical) x-axis line
+#' \item show_yaxis = FALSE: show (horizontal) y-axis
 #' \item yaxis_title = yval: name of y-axis title (string), set NA to remove it
 #' \item axis_title_color = '#606060': color of axes titles
 #' \item axis_title_size = 15: size of axes titles
@@ -29,7 +32,7 @@
 #' }
 #'
 #'
-#' @return an echarts4r line and scatter plot
+#' @return an echarts4r lollipop plot
 #' @export
 #'
 #' @import echarts4r
@@ -37,25 +40,28 @@
 #' @importFrom magrittr %>%
 #'
 #' @examples
-#' \dontrun{plot_ecbar(dp)}
+#' \dontrun{plot_eclollipop(dp)}
 #' \dontrun{
 #' dp = list(NULL)
 #' dp$tab = tab
 #' dp$xval = 'x'
 #' dp$yval = 'y'
-#' dp$group = 'group'
-#' dp$color = c('#b4943e', '#777acd', '#60a862', '#c45ca2', '#cb5a4c')
+#' dp$color = 'color'
 #' dp$pointsize = 8
 #' dp$linesize = 2
 #' dp$title = NULL
 #' dp$text_format = ''
-#' dp$show_legend = FALSE
 #' dp$show_label = FALSE
 #' dp$label_color = '#A9A9A9'
 #' dp$label_size = 10
-#' dp$ax_label_color = '#606060'
-#' dp$ax_label_size = 10
+#' dp$label_position = 'out'
+#' dp$x_label_color = '#606060'
+#' dp$x_label_size = 15
+#' dp$y_label_color = '#606060'
+#' dp$y_label_size = 10
 #' dp$xaxis_title = NULL
+#' dp$show_xaxis_line = FALSE
+#' dp$show_yaxis = FALSE
 #' dp$yaxis_title = NULL
 #' dp$axis_title_color = '#606060'
 #' dp$axis_title_size = 15
@@ -63,14 +69,17 @@
 #' dp$show_ygrid = FALSE
 #' dp$margin_left = '10%'
 #' dp$margin_right = '12'
-#' fplot = plot_ecscatter(dp)
+#' fplot = plot_lollipop(dp)
 #' fplot
 #' }
 #'
-plot_ecscatter = function(dp = NULL){
+plot_eclollipop = function(dp = NULL){
 
   color = NULL
-  group = NULL
+  key = NULL
+  dyval = NULL
+  yval1 = NULL
+  yval2 = NULL
 
   fgrey = '#A9A9A9'    # light grey
   fgrid_size = 0.25   # width of grid line
@@ -85,10 +94,12 @@ plot_ecscatter = function(dp = NULL){
 
   xval = ifelse('xval' %in% names(dp), dp$xval, 'x')  # x-col
   yval = ifelse('yval' %in% names(dp), dp$yval, 'y')  # y-col
-  # group
-  group = ifelse('group' %in% names(dp), dp$group, 'group')  # y-col
-  if (!group %in% names(tab)){
-    tab[, group := 'Wert']
+
+  # color
+  col  = ifelse('color' %in% names(dp), dp$color, 'color')  # color-col
+  # add color col
+  if (!col %in% names(tab)){
+    tab[, color := '#da9e92']
   }
 
   # symbol size and line size
@@ -100,37 +111,57 @@ plot_ecscatter = function(dp = NULL){
   margin_right = ifelse('margin_right' %in% names(dp), dp$margin_right, '12')  # y-col
   # text format
   text_format = ifelse('text_format' %in% names(dp), dp$text_format, '')
-
-  # text label
-  show_label  = ifelse('show_label' %in% names(dp), dp$show_label, FALSE)
+  # label
+  show_label  = ifelse('show_label'  %in% names(dp), dp$show_label, TRUE)
   label_color = ifelse('label_color' %in% names(dp), dp$label_color, '#A9A9A9')
   label_size  = ifelse('label_size'  %in% names(dp), dp$label_size, 10)
+  # positions: out, left, right, inside, top, bottom
+  label_position = ifelse('label_position' %in% names(dp), dp$label_position, 'out')
+  # label position details
+  if (label_position == 'out'){
+    label_pos1 = 'right'  # positive values
+    label_pos2 = 'left'   # negative values
+  } else {
+    label_pos1 = label_position
+    label_pos2 = label_position
+  }
+
+  x_label_color = ifelse('x_label_color' %in% names(dp), dp$x_label_color, '#606060')
+  x_label_size  = ifelse('x_label_size'  %in% names(dp), dp$x_label_size, 15)
 
   # axis labels
-  ax_label_color = ifelse('ax_label_color' %in% names(dp), dp$ax_label_color, '#606060')
-  ax_label_size  = ifelse('ax_label_size'  %in% names(dp), dp$ax_label_size, 10)
+  y_label_color = ifelse('ax_label_color' %in% names(dp), dp$ax_label_color, '#606060')
+  y_label_size  = ifelse('ax_label_size'  %in% names(dp), dp$ax_label_size, 10)
 
   # axis names ect
-  xaxis_title  = ifelse('xaxis_title'  %in% names(dp), dp$xaxis_title, xval)
+  xaxis_title  = ifelse('xaxis_title'  %in% names(dp), dp$xaxis_title, '')
   yaxis_title  = ifelse('yaxis_title'  %in% names(dp), dp$yaxis_title, yval)
   axis_title_size  = ifelse('axis_title_size'  %in% names(dp), dp$axis_title_size, 15)
   axis_title_color  = ifelse('axis_title_color'  %in% names(dp), dp$axis_title_color, '#606060')
+  show_xaxis_line = ifelse('show_xaxis_line'  %in% names(dp), dp$show_xaxis_line, FALSE)
+  show_yaxis = ifelse('show_yaxis'  %in% names(dp), dp$show_yaxis, FALSE)
+
 
   # axis grid
   show_xgrid = ifelse('show_xgrid'  %in% names(dp), dp$show_xgrid, FALSE)
   show_ygrid = ifelse('show_ygrid'  %in% names(dp), dp$show_ygrid, FALSE)
 
-  # legend
-  show_legend = ifelse('show_legend'  %in% names(dp), dp$show_legend, FALSE)
-
-
   names(tab)[names(tab) == xval] = 'xval'
   names(tab)[names(tab) == yval] = 'yval'
-  names(tab)[names(tab) == group] = 'group'
+  names(tab)[names(tab) == col] = 'color'
 
-  # text and axis tooltip format
+  # prepare table for lollipop
+  dt1 = (tab %>% copy)[, key := paste0('k', (.N %>% seq))][, dyval := yval %>% copy]
+  dt2 = (tab %>% copy)[, key := paste0('k', (.N %>% seq))][, dyval := 0][, yval := NA]
+  tab2 = rbind(dt1, dt2)
+
+  # pos vs negative values
+  tab2[yval >= 0, yval1 := yval]
+  tab2[yval < 0, yval2 := yval]
+
+  # text and tooltip format
   js_numform = "function (params) {
-    let f= Intl.NumberFormat('de-DE').format(params.value[1]);
+    let f= Intl.NumberFormat('de-DE').format(params.value[0]);
     return f;}"
 
   js_axisform = "function (params) {
@@ -139,14 +170,14 @@ plot_ecscatter = function(dp = NULL){
 
   js_ttform = "function (params) {
     let f = Intl.NumberFormat('de-DE').format(params.value[0]);
-    let g = Intl.NumberFormat('de-DE').format(params.value[1]);
+    let g = params.name;
     let h = params.seriesName;
-    return h + '<br>' +'x = ' + f + '<br>'  +'y = ' + g;}"
+    return g + '<br>' +'Wert: '+f;}"
 
   if (text_format == 'percent'){
     tab[, yval := yval * 100]
     js_numform = "function (params) {
-    let f= Intl.NumberFormat('de-DE').format(params.value[1]);
+    let f= Intl.NumberFormat('de-DE').format(params.value[0]);
     return f+'%';}"
 
     js_axisform = "function (params) {
@@ -155,14 +186,14 @@ plot_ecscatter = function(dp = NULL){
 
     js_ttform = "function (params) {
     let f = Intl.NumberFormat('de-DE').format(params.value[0]);
-    let g = Intl.NumberFormat('de-DE').format(params.value[1]);
+    let g = params.name;
     let h = params.seriesName;
-    return h + '<br>' +'x = ' + f + '<br>'  +'y = ' + g + '%';}"
+    return g + '<br>' +'Wert: '+f+'%';}"
   }
 
   if (text_format == 'euro'){
     js_numform = "function (params) {
-    let f= Intl.NumberFormat('de-DE').format(params.value[1]);
+    let f= Intl.NumberFormat('de-DE').format(params.value[0]);
     return f+'\u20AC';}"
 
     js_axisform = "function (params) {
@@ -171,54 +202,74 @@ plot_ecscatter = function(dp = NULL){
 
     js_ttform = "function (params) {
     let f = Intl.NumberFormat('de-DE').format(params.value[0]);
-    let g = Intl.NumberFormat('de-DE').format(params.value[1]);
+    let g = params.name;
     let h = params.seriesName;
-    return h + '<br>' +'x = ' + f + '<br>'  +'y = ' + g + '\u20AC';}"
+    return g + '<br>' +'Wert: '+f+'\u20AC';}"
   }
 
 
-  fplot = tab %>%
-    group_by(group) %>%
+  fplot = tab2 %>%
+    group_by(key) %>%
     e_charts(xval) %>%
     e_grid(left = margin_left, right = margin_right) %>%
-    #e_scatter(yval, symbolSize = pointsize) %>%
-    e_line(yval, symbolSize = pointsize, symbol = 'circle', lineStyle = list(width=linesize)) %>%
-    # e_color(color = c('green', 'blue', 'grey')) %>%
-    # e_add("itemStyle", 'color') %>%
-    e_labels(show=show_label, position = 'right', fontSize = label_size, color=label_color,
-             formatter = htmlwidgets::JS(js_numform)) %>%
+    e_line(dyval, symbolSize = 0, lineStyle = list(width=linesize)) %>%
+    # e_bar(yval,
+    #       barWidth = 2,
+    #       barCategoryGap = '100%',
+    #       barGap = '-100%') %>%
+    e_scatter(yval1,
+              symbolSize = pointsize,
+              itemStyle = list(opacity=1),
+              label = list(show=show_label,
+                           position = label_pos1,
+                           fontSize = label_size,
+                           color=label_color,
+                           formatter = htmlwidgets::JS(js_numform)
+                           )) %>%
+    e_scatter(yval2,
+              symbolSize = pointsize,
+              itemStyle = list(opacity=1),
+              label = list(show=show_label,
+                           position = label_pos2,
+                           fontSize = label_size,
+                           color=label_color,
+                           formatter = htmlwidgets::JS(js_numform)
+              )) %>%
+   # e_scatter(yval2, symbolSize = pointsize, itemStyle = list(opacity=1)) %>%
+    #e_bar(yval) %>%
+    e_color(color = tab$color) %>%
+    #e_add("itemStyle", opacity=1) %>%
+ #   e_labels(fontSize = label_size, color=label_color,
+#             formatter = htmlwidgets::JS(js_numform)) %>%
+    # e_add('label', position) %>%
     e_x_axis(
+      type = "category",
       name = xaxis_title,
+      nameLocation='end',
+      nameTextStyle = list(color = axis_title_color, fontSize = axis_title_size),
+      axisLine=list(show=show_xaxis_line, lineStyle = list(color=fgrey, opacity=1, width=fgrid_size)),
+      splitLine=list(show=show_xgrid, lineStyle = list(color=fgrey, opacity=1, width=fgrid_size)),
+      axisLabel = list(color=x_label_color, fontSize=x_label_size),
+      axisTick = list(show=FALSE)
+    ) %>%
+    e_y_axis(
+      show = show_yaxis,
+      name = yaxis_title,
       nameLocation='middle',
       nameGap=30,
       nameTextStyle = list(color = axis_title_color, fontSize = axis_title_size),
       axisLine=list(show=FALSE),
-      splitLine=list(show=show_xgrid, lineStyle = list(color=fgrey, opacity=1, width=fgrid_size)),
-      axisLabel = list(color=ax_label_color, fontSize=ax_label_size, formatter = htmlwidgets::JS("function (value) {var f= Intl.NumberFormat('de-DE').format(value); return f;}")),
-      axisTick = list(show=FALSE),
-      min = 'dataMin'
-    ) %>%
-    e_y_axis(
-      name = yaxis_title,
-      nameTextStyle = list(color = axis_title_color, fontSize = axis_title_size),
-      axisLine=list(show=FALSE),
       splitLine=list(show=show_ygrid, lineStyle = list(color=fgrey, opacity=1, width=fgrid_size)),
-      axisLabel = list(color=ax_label_color, fontSize=ax_label_size, formatter = htmlwidgets::JS(js_axisform)),
+      axisLabel = list(color=y_label_color, fontSize=y_label_size, formatter = htmlwidgets::JS(js_axisform)),
       axisTick = list(show=FALSE)
     ) %>%
-    e_legend(show = show_legend, right = '10%') %>%
-    # e_x_axis(type = "category", axisLabel = list(fontSize=x_label_size, color=x_label_color)) %>%
-    # e_y_axis(show=FALSE) %>%
-    #e_flip_coords() %>%
+
+    e_flip_coords() %>%
+    e_legend(show = FALSE) %>%
     #e_text_style(fontSize = 30, color='blue') %>%
     e_toolbox_feature(feature = "saveAsImage") %>%
     #  e_toolbox_feature(feature = "dataView") %>%
     e_tooltip(formatter = htmlwidgets::JS(js_ttform))
-
-  # Color
-  if ('color' %in% names(dp)){
-    fplot = fplot %>% e_color(color = dp$color)
-  }
 
   # Title
   if ('title' %in% names(dp)){

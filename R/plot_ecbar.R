@@ -45,7 +45,7 @@
 #' dp$margin_right = '12'
 #' dp$title = 'Chart'
 #' dp$legend = FALSE
-#' fplot = plot_ecpar(dp)
+#' fplot = plot_ecbar(dp)
 #' fplot
 #' }
 #'
