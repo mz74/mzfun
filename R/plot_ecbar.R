@@ -160,5 +160,4 @@ plot_ecbar = function(dp = NULL){
   }
 
   return(fplot)
-
 }

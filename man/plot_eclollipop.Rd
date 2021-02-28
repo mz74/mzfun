@@ -11,8 +11,8 @@ plot_eclollipop(dp = NULL)
 
 \itemize{
 \item tab: table to be plotted, already aggregated
-\item xval = 'x': column name with x-values
-\item yval = 'y': column name with y-values
+\item xval = 'x': column name with x-values, categorical or integer values
+\item yval = 'y': column name with y-values, numerical values
 \item color = 'color': column name with colors
 \item pointsize = 8: symbol size
 \item linesize = 2: line width of line plot

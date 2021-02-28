@@ -11,9 +11,9 @@ plot_ecdot(dp = NULL)
 
 \itemize{
 \item tab: table to be plotted, already aggregated
-\item xval = 'x': column name with x-values
-\item yval = 'y': column name with y-values
-\item group = 'group': column name with group values
+\item xval = 'x': column name with x-values, categorical or integer values
+\item yval = 'y': column name with y-values, numerical values
+\item group = 'group': column name with group values, categorical values
 \item color = 'color': column name with colors
 \item pointsize = 8: symbol size
 \item linesize = 2: line width of line plot
@@ -25,10 +25,10 @@ plot_ecdot(dp = NULL)
 \item label_color = '#A9A9A9': color of text labels
 \item label_size = 10: size of text labels
 \item label_position = 'out': position of text labels ('out', 'left', 'right', 'inside', 'top', 'bottom')
-\item x_label_color = '#606060': color of x-axes text labels
-\item x_label_size = 15: size of x-axes text labels
-\item y_label_color = '#606060': color of y-axes text labels
-\item y_label_size = 10: size of y-axes text labels
+\item x_label_color = '#606060': color of x-axis text labels
+\item x_label_size = 15: size of x-axis text labels
+\item y_label_color = '#606060': color of y-axis text labels
+\item y_label_size = 10: size of y-axis text labels
 \item xaxis_title = '': name of x-axis title (string), set NA to remove it
 \item show_xaxis_line = FALSE: show (vertical) x-axis line
 \item show_yaxis = FALSE: show (horizontal) y-axis
@@ -42,7 +42,7 @@ plot_ecdot(dp = NULL)
 }}
 }
 \value{
-an echarts4r lollipop plot
+an echarts4r dot or cleveland plot
 }
 \description{
 Interactive Dot or Cleveland Plot

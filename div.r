@@ -14,6 +14,7 @@ install()
 #use_r('explore_table')
 #use_r('plot_ecbar')
 #use_r('plot_ecdots')
+use_r('plot_heatmap')
 
 # change readme.rmd and then
 #build_readme()
@@ -24,6 +25,41 @@ library(magrittr)
 library(ggplot2)
 library(echarts4r)
 library(mzfun)
+
+# heatmap
+
+v <- paste(LETTERS[1:10], '- datetime')
+matrix <- data.frame(
+  x = sample(v, 300, replace = TRUE),
+  y = sample(v, 300, replace = TRUE),
+  z = rnorm(300, 10, 1),
+  stringsAsFactors = FALSE
+) %>%
+  dplyr::group_by(x, y) %>%
+  dplyr::summarise(z = sum(z)) %>%
+  dplyr::ungroup()
+#> `summarise()` has grouped output by 'x'. You can override using the `.groups` argument.
+
+matrix %>% setDT
+matrix[, z := z %>% round(0)]
+dp = list(NULL)
+dp$data = matrix
+dp$xval = 'x'
+dp$yval = 'y'
+dp$zval = 'z'
+dp$colors = c('#fef8cb', '#985b5a')
+dp$label_color = 'black'
+dp$xaxis_title = 'Title from x'
+dp$yaxis_title = 'Title from y'
+mp = plot_echeatmap(dp)
+mp
+
+
+matrix %>%
+  e_charts(x) %>%
+  e_heatmap(y, z) %>%
+  e_visual_map(z) %>%
+  e_title("Heatmap")
 
 # add_table_right
 d1 = mtcars
@@ -173,5 +209,7 @@ library(data.table)
 b1 = data.table(A = c(0.3472343, 0.00234))
 b1[, b2 := signif(b1, 3)]
 b1[, b3 := as.character(b2)]
+
+
 
 
