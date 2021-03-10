@@ -15,7 +15,13 @@
 #' \item margin_left = '10%': chart margin left
 #' \item margin_right = '12': chart margin right
 #' \item text_format = '': text format is '' (standard), 'percent', or 'euro'
+#' \item chart_width = NULL: chart width (css units)
+#' \item chart_height = NULL: chart height (css units)
 #' \item legend = FALSE: show (TRUE/FALSE) the legend
+#' \item legend_left = 'auto': legend position left
+#' \item legend_right = 'auto': legend position right
+#' \item legend_top = 'auto': legend position top
+#' \item legend_bottom = 'auto': legend position bottom
 #' \item title: chart title
 #' }
 #'
@@ -44,7 +50,13 @@
 #' dp$margin_left = '10%'
 #' dp$margin_right = '12'
 #' dp$title = 'Chart'
+#' dp$chart_width = NULL
+#' dp$chart_height = NULL
 #' dp$legend = FALSE
+#' dp$legend_left = 'auto'
+#' dp$legend_right = 'auto'
+#' dp$legend_top = 'auto'
+#' dp$legend_bottom = 'auto'
 #' fplot = plot_ecbar(dp)
 #' fplot
 #' }
@@ -54,15 +66,25 @@ plot_ecbar = function(dp = NULL){
   color = NULL
   group = NULL
 
+  # helper function
+  # assign dval1 (TRUE) or dval2 (FALSE)
+  df_assign = function(dlist, dval1, dval2){
+    if (dval1 %in% names(dlist)){
+      return(dp[[dval1]])
+    } else{
+      return(dval2)
+    }
+  }
+
 
 
   # data is needed
-  if (!'data' %in% names(dp)){
+  if (!'tab' %in% names(dp)){
     print('Please, provide data')
     return (NULL)
   }
 
-  tab  = dp$data %>% copy %>% setDT   # data
+  tab  = dp$tab %>% copy %>% setDT   # data
 
   xval = ifelse('xval' %in% names(dp), dp$xval, 'x')  # x-col
   yval = ifelse('yval' %in% names(dp), dp$yval, 'y')  # y-col
@@ -77,6 +99,19 @@ plot_ecbar = function(dp = NULL){
   if (!col %in% names(tab)){
     tab[, color := '#da9e92']
   }
+
+
+
+  # chart size
+  chart_width = df_assign(dp, 'chart_width', NULL)
+  chart_height = df_assign(dp, 'chart_height', NULL)
+
+  # legend position and orientation
+  legend_left = df_assign(dp, 'legend_left', 'auto')
+  legend_right = df_assign(dp, 'legend_right', 'auto')
+  legend_top = df_assign(dp, 'legend_top', 'auto')
+  legend_bottom = df_assign(dp, 'legend_bottom', 'auto')
+  legend_orient = df_assign(dp, 'legend_orient', 'horizontal') # or vertical
 
   # grid margins
   margin_left  = ifelse('margin_left'  %in% names(dp), dp$margin_left,  '10%')  # x-col
@@ -133,7 +168,7 @@ plot_ecbar = function(dp = NULL){
 
   fplot = tab %>%
     group_by(group) %>%
-    e_charts(xval) %>%
+    e_charts(xval, width = chart_width, height = chart_height) %>%
     e_grid(left = margin_left, right = margin_right) %>%
     e_bar(yval) %>%
     e_color(color = tab$color) %>%
@@ -154,7 +189,12 @@ plot_ecbar = function(dp = NULL){
   }
   # Legend
   if ('legend' %in% names(dp)){
-    fplot = fplot %>% e_legend(show = dp$legend, right = '10%')
+    fplot = fplot %>% e_legend(show = dp$legend,
+                               right = legend_right,
+                               left = legend_left,
+                               bottom = legend_bottom,
+                               top = legend_top,
+                               orient = legend_orient)
   } else {
     fplot = fplot %>% e_legend(show = FALSE)
   }

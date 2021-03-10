@@ -9,7 +9,7 @@ plot_echeatmap(dp = NULL)
 \arguments{
 \item{dp}{List of parameters
 
-#' \itemize{
+\itemize{
 \item tab: table to be plotted, already aggregated
 \item xval = 'x': column name with x-values, categorical or integer values
 \item yval = 'y': column name with y-values, categorical or integer values

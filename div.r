@@ -129,8 +129,8 @@ dp$show_xaxis_line = TRUE
 dp$show_yaxis = TRUE
 dp$xaxis_title = 'Altersklasse'
 
-#mp = plot_ecbar(dp)
-mp = plot_eclollipop(dp)
+mp = plot_ecbar(dp)
+#mp = plot_eclollipop(dp)
 mp
 
 

@@ -92,12 +92,12 @@ plot_ecdot = function(dp = NULL){
   fgrid_size = 0.25   # width of grid line
 
   # data is needed
-  if (!'data' %in% names(dp)){
+  if (!'tab' %in% names(dp)){
     print('Please, provide data')
     return (NULL)
   }
 
-  tab  = dp$data %>% copy %>% setDT   # data
+  tab  = dp$tab %>% copy %>% setDT   # data
 
   xval = ifelse('xval' %in% names(dp), dp$xval, 'x')  # x-col
   yval = ifelse('yval' %in% names(dp), dp$yval, 'y')  # y-col

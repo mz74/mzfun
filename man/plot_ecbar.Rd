@@ -22,7 +22,13 @@ plot_ecbar(dp = NULL)
 \item margin_left = '10\%': chart margin left
 \item margin_right = '12': chart margin right
 \item text_format = '': text format is '' (standard), 'percent', or 'euro'
+\item chart_width = NULL: chart width (css units)
+\item chart_height = NULL: chart height (css units)
 \item legend = FALSE: show (TRUE/FALSE) the legend
+\item legend_left = 'auto': legend position left
+\item legend_right = 'auto': legend position right
+\item legend_top = 'auto': legend position top
+\item legend_bottom = 'auto': legend position bottom
 \item title: chart title
 }}
 }
@@ -49,7 +55,13 @@ dp$x_label_size = 15
 dp$margin_left = '10\%'
 dp$margin_right = '12'
 dp$title = 'Chart'
+dp$chart_width = NULL
+dp$chart_height = NULL
 dp$legend = FALSE
+dp$legend_left = 'auto'
+dp$legend_right = 'auto'
+dp$legend_top = 'auto'
+dp$legend_bottom = 'auto'
 fplot = plot_ecbar(dp)
 fplot
 }
