@@ -44,7 +44,7 @@ matrix <- data.frame(
 matrix %>% setDT
 matrix[, z := z %>% round(0)]
 dp = list(NULL)
-dp$data = matrix
+dp$tab = matrix
 dp$xval = 'x'
 dp$yval = 'y'
 dp$zval = 'z'
@@ -52,6 +52,7 @@ dp$colors = c('#fef8cb', '#985b5a')
 dp$label_color = 'black'
 dp$xaxis_title = 'Title from x'
 dp$yaxis_title = 'Title from y'
+dp$text_format = 'percent'
 mp = plot_echeatmap(dp)
 mp
 

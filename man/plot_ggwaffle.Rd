@@ -30,10 +30,28 @@ E.g. centered facet pillars
 \item facet_ncol = 5: maximum number of facet columns
 
 \item legend = 'none': legend position (top, right, left, bottom, none, label)
-'label' uses labels as legend symbols, works only in some situation with
+'label' uses labels as legend symbols, works only in some situations with
 position always right
 \item legend_symbol_size = 3: size of legend symbols
-\item legend_text_size = 10: #'
+\item legend_text_size = 15: size of legend text
+\item label_legend_size = 10: size of label-legend symbols and text
+\item label_legend_color = '#A9A9A9': color of label-legend text
+
+\item facet_margin = 2: (-2 if legend = 'label'), inner margin between neighboring
+facets.
+\item chart_xy_margin = 1: (3 if legend = 'label' to give enough space),
+extra xy-limit for each plot (increases x-axis limits)
+\item margin_bottom = 1: to increase y-axis at bottom side
+\item margin_top = 1: to increase y-axis at top side
+\item outermargin_left = 0: chart margin left
+\item outermargin_right = 1: chart margin right
+
+\item facet_text_size = 25: size of facet title
+\item facet_text_color = '#707070': color of facet title
+\item facet_title_position = 'bottom': position of facet title (top, left, bottom, right)
+
+\item font = '': font family of chart
+
 }}
 }
 \value{
@@ -43,31 +61,11 @@ a ggplot waffle chart
 Waffle Plot
 }
 \examples{
-\dontrun{plot_ecbar(dp)}
+\dontrun{plot_ggwaffel(dp)}
 \dontrun{
 dp = list(NULL)
 dp$tab = tab
-dp$xval = 'x'
-dp$yval = 'y'
-dp$group = 'group'
-dp$color = 'color'
-dp$text_format = ''
-dp$label_color = '#A9A9A9'
-dp$label_size = 10
-dp$x_label_color = '#606060'
-dp$x_label_size = 15
-dp$margin_left = '10\%'
-dp$margin_right = '12'
-dp$title = 'Chart'
-dp$chart_width = NULL
-dp$chart_height = NULL
-dp$legend = FALSE
-dp$legend_left = 'auto'
-dp$legend_right = 'auto'
-dp$legend_top = 'auto'
-dp$legend_bottom = 'auto'
-dp$legend_orient = 'horizontal'
-fplot = plot_ecbar(dp)
+fplot = plot_ggwaffel(dp)
 fplot
 }
 

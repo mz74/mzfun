@@ -132,7 +132,7 @@ plot_echeatmap = function(dp = NULL){
     return g + '<br>' +h+': '+f;}"
 
   if (text_format == 'percent'){
-    tab[, yval := yval * 100]
+    tab[, zval := zval * 100]
     js_numform = "function (params) {
     let f= Intl.NumberFormat('de-DE').format(params.value[2]);
     return f+'%';}"
