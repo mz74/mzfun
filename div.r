@@ -14,7 +14,8 @@ install()
 #use_r('explore_table')
 #use_r('plot_ecbar')
 #use_r('plot_ecdots')
-use_r('plot_heatmap')
+#use_r('plot_heatmap')
+use_r('plot_ggwaffle')
 
 # change readme.rmd and then
 #build_readme()

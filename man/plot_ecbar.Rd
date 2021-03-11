@@ -29,6 +29,7 @@ plot_ecbar(dp = NULL)
 \item legend_right = 'auto': legend position right
 \item legend_top = 'auto': legend position top
 \item legend_bottom = 'auto': legend position bottom
+\item legend_orient = 'horizontal': legend orientation (horizontal or vertical)
 \item title: chart title
 }}
 }
@@ -62,6 +63,7 @@ dp$legend_left = 'auto'
 dp$legend_right = 'auto'
 dp$legend_top = 'auto'
 dp$legend_bottom = 'auto'
+dp$legend_orient = 'horizontal'
 fplot = plot_ecbar(dp)
 fplot
 }
