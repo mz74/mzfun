@@ -13,7 +13,9 @@
 #' \item label_size = 10: size of text labels
 #' \item x_label_size = 15: size of x-axis text labels
 #' \item margin_left = '10%': chart margin left
-#' \item margin_right = '12': chart margin right
+#' \item margin_right = '10%': chart margin right
+#' \item margin_top = 60: chart margin top
+#' \item margin_bottom = 60: chart margin bottom
 #' \item text_format = '': text format is '' (standard), 'percent', or 'euro'
 #' \item chart_width = NULL: chart width (css units)
 #' \item chart_height = NULL: chart height (css units)
@@ -49,7 +51,9 @@
 #' dp$x_label_color = '#606060'
 #' dp$x_label_size = 15
 #' dp$margin_left = '10%'
-#' dp$margin_right = '12'
+#' dp$margin_right = '10%'
+#' dp$margin_top = 60
+#' dp$margin_bottom = 60
 #' dp$title = 'Chart'
 #' dp$chart_width = NULL
 #' dp$chart_height = NULL
@@ -116,8 +120,10 @@ plot_ecbar = function(dp = NULL){
   legend_orient = df_assign(dp, 'legend_orient', 'horizontal') # or vertical
 
   # grid margins
-  margin_left  = ifelse('margin_left'  %in% names(dp), dp$margin_left,  '10%')  # x-col
-  margin_right = ifelse('margin_right' %in% names(dp), dp$margin_right, '12')  # y-col
+  margin_left   = ifelse('margin_left'  %in% names(dp), dp$margin_left,  '10%')  # x-col
+  margin_right  = ifelse('margin_right' %in% names(dp), dp$margin_right, '10%')  # y-col
+  margin_top    = ifelse('margin_top' %in% names(dp), dp$margin_top, 60)  # y-col
+  margin_bottom = ifelse('margin_bottom' %in% names(dp), dp$margin_bottom, 60)  # y-col
   # text format
   text_format = ifelse('text_format' %in% names(dp), dp$text_format, '')
   # label color
@@ -171,7 +177,7 @@ plot_ecbar = function(dp = NULL){
   fplot = tab %>%
     group_by(group) %>%
     e_charts(xval, width = chart_width, height = chart_height) %>%
-    e_grid(left = margin_left, right = margin_right) %>%
+    e_grid(left = margin_left, right = margin_right, top = margin_top, bottom = margin_bottom) %>%
     e_bar(yval) %>%
     e_color(color = tab$color) %>%
     e_add("itemStyle", color) %>%

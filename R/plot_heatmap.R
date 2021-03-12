@@ -24,7 +24,11 @@
 #' \item show_xgrid = FALSE: show x-grid (TRUE/FALSE)
 #' \item show_ygrid = FALSE: show y-grid (TRUE/FALSE)
 #' \item margin_left = '10%': chart margin left
-#' \item margin_right = '12': chart margin right
+#' \item margin_right = '10%': chart margin right
+#' \item margin_top = 60: chart margin top
+#' \item margin_bottom = 60: chart margin bottom
+#' \item chart_width = NULL: chart width (css units)
+#' \item chart_height = NULL: chart height (css units)
 #' }
 #'
 #'
@@ -60,8 +64,12 @@
 #' dp$show_xgrid = FALSE
 #' dp$show_ygrid = FALSE
 #' dp$margin_left = '10%'
-#' dp$margin_right = '12'
+#' dp$margin_right = '10%'
+#' dp$margin_top = 60
+#' dp$margin_bottom = 60
 #' dp$title = 'Chart'
+#' dp$chart_width = NULL
+#' dp$chart_height = NULL
 #' fplot = plot_echeatmap(dp)
 #' fplot
 #' }
@@ -70,6 +78,16 @@ plot_echeatmap = function(dp = NULL){
 
   fgrey = '#A9A9A9'    # light grey
   fgrid_size = 0.25   # width of grid line
+
+  # helper function
+  # assign dval1 (TRUE) or dval2 (FALSE)
+  df_assign = function(dlist, dval1, dval2){
+    if (dval1 %in% names(dlist)){
+      return(dp[[dval1]])
+    } else{
+      return(dval2)
+    }
+  }
 
   # data is needed
   if (!'tab' %in% names(dp)){
@@ -88,10 +106,17 @@ plot_echeatmap = function(dp = NULL){
     dcol = dp$colors
   }
 
+  # chart size
+  chart_width = df_assign(dp, 'chart_width', NULL)
+  chart_height = df_assign(dp, 'chart_height', NULL)
+
 
   # grid margins
-  margin_left  = ifelse('margin_left'  %in% names(dp), dp$margin_left,  '10%')  # x-col
-  margin_right = ifelse('margin_right' %in% names(dp), dp$margin_right, '12')  # y-col
+  margin_left   = ifelse('margin_left'  %in% names(dp), dp$margin_left,  '10%')  # x-col
+  margin_right  = ifelse('margin_right' %in% names(dp), dp$margin_right, '10%')  # y-col
+  margin_top    = ifelse('margin_top' %in% names(dp), dp$margin_top, 60)  # y-col
+  margin_bottom = ifelse('margin_bottom' %in% names(dp), dp$margin_bottom, 60)  # y-col
+
   # text format
   text_format = ifelse('text_format' %in% names(dp), dp$text_format, '')
   # label
@@ -157,7 +182,7 @@ plot_echeatmap = function(dp = NULL){
   }
 
   fplot = tab %>%
-    e_charts(xval) %>%
+    e_charts(xval, width = chart_width, height = chart_height) %>%
     e_heatmap(yval, zval) %>%
     e_visual_map(zval,
                  show =FALSE,
@@ -174,7 +199,7 @@ plot_echeatmap = function(dp = NULL){
              fontSize = label_size,
              color=label_color,
              formatter = htmlwidgets::JS(js_numform)) %>%
-    e_grid(left = margin_left, right = margin_right) %>%
+    e_grid(left = margin_left, right = margin_right, top = margin_top, bottom = margin_bottom) %>%
     e_x_axis(
       type = "category",
       name = xaxis_title,

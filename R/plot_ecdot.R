@@ -31,7 +31,17 @@
 #' \item show_xgrid = FALSE: show x-grid (TRUE/FALSE)
 #' \item show_ygrid = FALSE: show y-grid (TRUE/FALSE)
 #' \item margin_left = '10%': chart margin left
-#' \item margin_right = '12': chart margin right
+#' \item margin_right = '10%': chart margin right
+#' \item margin_top = 60: chart margin top
+#' \item margin_bottom = 60: chart margin bottom
+#' \item legend = FALSE: show (TRUE/FALSE) the legend
+#' \item legend_left = 'auto': legend position left
+#' \item legend_right = 'auto': legend position right
+#' \item legend_top = 'auto': legend position top
+#' \item legend_bottom = 'auto': legend position bottom
+#' \item legend_orient = 'horizontal': legend orientation (horizontal or vertical)
+#' \item chart_width = NULL: chart width (css units)
+#' \item chart_height = NULL: chart height (css units)
 #' }
 #'
 #'
@@ -74,7 +84,17 @@
 #' dp$show_xgrid = FALSE
 #' dp$show_ygrid = FALSE
 #' dp$margin_left = '10%'
-#' dp$margin_right = '12'
+#' dp$margin_right = '10%'
+#' dp$margin_top = 60
+#' dp$margin_bottom = 60
+#' dp$legend = FALSE
+#' dp$legend_left = 'auto'
+#' dp$legend_right = 'auto'
+#' dp$legend_top = 'auto'
+#' dp$legend_bottom = 'auto'
+#' dp$legend_orient = 'horizontal'
+#' dp$chart_width = NULL
+#' dp$chart_height = NULL
 #' fplot = plot_dot(dp)
 #' fplot
 #' }
@@ -90,6 +110,16 @@ plot_ecdot = function(dp = NULL){
 
   fgrey = '#A9A9A9'    # light grey
   fgrid_size = 0.25   # width of grid line
+
+  # helper function
+  # assign dval1 (TRUE) or dval2 (FALSE)
+  df_assign = function(dlist, dval1, dval2){
+    if (dval1 %in% names(dlist)){
+      return(dp[[dval1]])
+    } else{
+      return(dval2)
+    }
+  }
 
   # data is needed
   if (!'tab' %in% names(dp)){
@@ -114,6 +144,17 @@ plot_ecdot = function(dp = NULL){
     tab[, color := '#da9e92']
   }
 
+  # chart size
+  chart_width = df_assign(dp, 'chart_width', NULL)
+  chart_height = df_assign(dp, 'chart_height', NULL)
+
+  # legend position and orientation
+  legend_left = df_assign(dp, 'legend_left', 'auto')
+  legend_right = df_assign(dp, 'legend_right', 'auto')
+  legend_top = df_assign(dp, 'legend_top', 'auto')
+  legend_bottom = df_assign(dp, 'legend_bottom', 'auto')
+  legend_orient = df_assign(dp, 'legend_orient', 'horizontal') # or vertical
+
   # symbol size and line size
   pointsize  = ifelse('pointsize' %in% names(dp), dp$pointsize, 8)
   linesize   = ifelse('linesize'  %in% names(dp), dp$linesize,  2)
@@ -123,8 +164,10 @@ plot_ecdot = function(dp = NULL){
   line_color = ifelse('line_color' %in% names(dp), dp$line_color, '#A9A9A9')
 
   # grid margins
-  margin_left  = ifelse('margin_left'  %in% names(dp), dp$margin_left,  '10%')  # x-col
-  margin_right = ifelse('margin_right' %in% names(dp), dp$margin_right, '12')  # y-col
+  margin_left   = ifelse('margin_left'  %in% names(dp), dp$margin_left,  '10%')  # x-col
+  margin_right  = ifelse('margin_right' %in% names(dp), dp$margin_right, '10%')  # y-col
+  margin_top    = ifelse('margin_top' %in% names(dp), dp$margin_top, 60)  # y-col
+  margin_bottom = ifelse('margin_bottom' %in% names(dp), dp$margin_bottom, 60)  # y-col
   # text format
   text_format = ifelse('text_format' %in% names(dp), dp$text_format, '')
   # label
@@ -236,9 +279,9 @@ plot_ecdot = function(dp = NULL){
 
   fplot = tab %>%
     group_by(group) %>%
-    e_charts(xval) %>%
+    e_charts(xval, width = chart_width, height = chart_height) %>%
     # e_mark_line(data = list(xAxis = 'liberal')) %>%
-    e_grid(left = margin_left, right = margin_right) %>%
+    e_grid(left = margin_left, right = margin_right, top = margin_top, bottom = margin_bottom) %>%
     e_scatter(yval,
               symbolSize = pointsize,
               itemStyle = list(opacity=1),
@@ -296,7 +339,6 @@ plot_ecdot = function(dp = NULL){
     ) %>%
 
     e_flip_coords() %>%
-    e_legend(show = TRUE) %>%
     #e_text_style(fontSize = 30, color='blue') %>%
     e_toolbox_feature(feature = "saveAsImage") %>%
     #  e_toolbox_feature(feature = "dataView") %>%
@@ -335,6 +377,18 @@ plot_ecdot = function(dp = NULL){
                                      color = line_color,
                                      width = linesize))
     }
+  }
+
+  # Legend
+  if ('legend' %in% names(dp)){
+    fplot = fplot %>% e_legend(show = dp$legend,
+                               right = legend_right,
+                               left = legend_left,
+                               bottom = legend_bottom,
+                               top = legend_top,
+                               orient = legend_orient)
+  } else {
+    fplot = fplot %>% e_legend(show = FALSE)
   }
 
   return(fplot)

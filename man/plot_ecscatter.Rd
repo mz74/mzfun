@@ -19,7 +19,6 @@ plot_ecscatter(dp = NULL)
 \item linesize = 2: line width of line plot
 \item title: chart title
 \item text_format = '': text format is '' (standard), 'percent', or 'euro'
-\item show_legend = FALSE: show legend (TRUE/FALSE)
 \item show_label = FALSE: show text labels (TRUE/FALSE)
 \item label_color = '#A9A9A9': color of text labels
 \item label_size = 10: size of text labels
@@ -32,7 +31,17 @@ plot_ecscatter(dp = NULL)
 \item show_xgrid = FALSE: show x-grid (TRUE/FALSE)
 \item show_ygrid = FALSE: show y-grid (TRUE/FALSE)
 \item margin_left = '10\%': chart margin left
-\item margin_right = '12': chart margin right
+\item margin_right = '10\%': chart margin right
+\item margin_top = 60: chart margin top
+\item margin_bottom = 60: chart margin bottom
+\item legend = FALSE: show (TRUE/FALSE) the legend
+\item legend_left = 'auto': legend position left
+\item legend_right = 'auto': legend position right
+\item legend_top = 'auto': legend position top
+\item legend_bottom = 'auto': legend position bottom
+\item legend_orient = 'horizontal': legend orientation (horizontal or vertical)
+\item chart_width = NULL: chart width (css units)
+\item chart_height = NULL: chart height (css units)
 }}
 }
 \value{
@@ -54,7 +63,6 @@ dp$pointsize = 8
 dp$linesize = 2
 dp$title = NULL
 dp$text_format = ''
-dp$show_legend = FALSE
 dp$show_label = FALSE
 dp$label_color = '#A9A9A9'
 dp$label_size = 10
@@ -67,7 +75,17 @@ dp$axis_title_size = 15
 dp$show_xgrid = FALSE
 dp$show_ygrid = FALSE
 dp$margin_left = '10\%'
-dp$margin_right = '12'
+dp$margin_right = '10\%'
+dp$margin_top = 60
+dp$margin_bottom = 60
+dp$legend = FALSE
+dp$legend_left = 'auto'
+dp$legend_right = 'auto'
+dp$legend_top = 'auto'
+dp$legend_bottom = 'auto'
+dp$legend_orient = 'horizontal'
+dp$chart_width = NULL
+dp$chart_height = NULL
 fplot = plot_ecscatter(dp)
 fplot
 }

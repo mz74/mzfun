@@ -31,7 +31,11 @@ plot_echeatmap(dp = NULL)
 \item show_xgrid = FALSE: show x-grid (TRUE/FALSE)
 \item show_ygrid = FALSE: show y-grid (TRUE/FALSE)
 \item margin_left = '10\%': chart margin left
-\item margin_right = '12': chart margin right
+\item margin_right = '10\%': chart margin right
+\item margin_top = 60: chart margin top
+\item margin_bottom = 60: chart margin bottom
+\item chart_width = NULL: chart width (css units)
+\item chart_height = NULL: chart height (css units)
 }}
 }
 \value{
@@ -64,8 +68,12 @@ dp$axis_title_size = 15
 dp$show_xgrid = FALSE
 dp$show_ygrid = FALSE
 dp$margin_left = '10\%'
-dp$margin_right = '12'
+dp$margin_right = '10\%'
+dp$margin_top = 60
+dp$margin_bottom = 60
 dp$title = 'Chart'
+dp$chart_width = NULL
+dp$chart_height = NULL
 fplot = plot_echeatmap(dp)
 fplot
 }
