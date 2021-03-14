@@ -8,6 +8,10 @@
 #' \item yval = 'y': column name with y-values
 #' \item group = 'group': column name for grouping (not needed)
 #' \item color = 'color': column name with color-values
+#' \item label_position = 'right': position of text labels ('none', 'top',
+#' 'left', 'right', 'bottom', 'inside', 'insideLeft', 'insideRight',
+#' 'insideTop', 'insideBottom', 'insideTopLeft', 'insideBottomLeft',
+#' 'insideTopRight', 'insideBottomRight')
 #' \item label_color = '#A9A9A9': color of text labels
 #' \item x_label_color = '#606060': color of x-axis text labels
 #' \item label_size = 10: size of text labels
@@ -28,6 +32,14 @@
 #' \item title: chart title
 #' \item y_min = NULL: min. value on y-axis
 #' \item y_max = NULL: max. value on y-axis
+#' \item show_yaxis = FALSE: show y-axis (TRUE/FALSE)
+#' \item yaxis_title  = yval: name of y-axis (title)
+#' \item yaxis_title_size  = 15: text size of y-axis title
+#' \item yaxis_title_color  = '#606060': text color of yaxis title
+#' \item show_ygrid = FALSE: show y-grid
+#' \item ygrid_color = fgrey: color of y-grid
+#' \item y_label_color = '#606060'): color of y-axis text labels
+#' \item y_label_size  = 10: size of y-axis text labels
 #' }
 #'
 #'
@@ -73,6 +85,9 @@ plot_ecbar = function(dp = NULL){
 
   color = NULL
   group = NULL
+
+  fgrey = '#A9A9A9'    # light grey
+  fgrid_size = 0.25   # width of grid line
 
   # helper function
   # assign dval1 (TRUE) or dval2 (FALSE)
@@ -125,6 +140,13 @@ plot_ecbar = function(dp = NULL){
   legend_bottom = df_assign(dp, 'legend_bottom', 'auto')
   legend_orient = df_assign(dp, 'legend_orient', 'horizontal') # or vertical
 
+  # labels
+  label_position = df_assign(dp, 'label_position', 'right')
+  show_labels = TRUE
+  if (label_position == 'none'){
+    show_labels = FALSE
+  }
+
   # grid margins
   margin_left   = ifelse('margin_left'  %in% names(dp), dp$margin_left,  '10%')  # x-col
   margin_right  = ifelse('margin_right' %in% names(dp), dp$margin_right, '10%')  # y-col
@@ -138,6 +160,18 @@ plot_ecbar = function(dp = NULL){
   x_label_color = ifelse('x_label_color' %in% names(dp), dp$x_label_color, '#606060')
   x_label_size  = ifelse('x_label_size'  %in% names(dp), dp$x_label_size, 15)
 
+  # y-axis
+  show_yaxis = df_assign(dp, 'show_yaxis', FALSE)
+  yaxis_title  = df_assign(dp, 'yaxis_title', yval)
+  yaxis_title_size  = df_assign(dp, 'yaxis_title_size', 15)
+  yaxis_title_color  = df_assign(dp, 'yaxis_title_color', '#606060')
+  show_ygrid = df_assign(dp, 'show_ygrid', FALSE)
+  ygrid_color = df_assign(dp, 'ygrid_color', fgrey)
+  y_label_color = df_assign(dp, 'ax_label_color', '#606060')
+  y_label_size  = df_assign(dp, 'ax_label_size', 10)
+
+
+
   names(tab)[names(tab) == xval] = 'xval'
   names(tab)[names(tab) == yval] = 'yval'
   names(tab)[names(tab) == col] = 'color'
@@ -146,6 +180,10 @@ plot_ecbar = function(dp = NULL){
   # text and tooltip format
   js_numform = "function (params) {
     let f= Intl.NumberFormat('de-DE').format(params.value[0]);
+    return f;}"
+
+  js_axisform = "function (params) {
+    let f= Intl.NumberFormat('de-DE').format(params);
     return f;}"
 
   js_ttform = "function (params) {
@@ -160,6 +198,10 @@ plot_ecbar = function(dp = NULL){
     let f= Intl.NumberFormat('de-DE').format(params.value[0]);
     return f+'%';}"
 
+    js_axisform = "function (params) {
+    let f= Intl.NumberFormat('de-DE').format(params);
+    return f+'%';}"
+
     js_ttform = "function (params) {
     let f = Intl.NumberFormat('de-DE').format(params.value[0]);
     let g = params.name;
@@ -170,6 +212,10 @@ plot_ecbar = function(dp = NULL){
   if (text_format == 'euro'){
     js_numform = "function (params) {
     let f= Intl.NumberFormat('de-DE').format(params.value[0]);
+    return f+'\u20AC';}"
+
+    js_axisform = "function (params) {
+    let f= Intl.NumberFormat('de-DE').format(params);
     return f+'\u20AC';}"
 
     js_ttform = "function (params) {
@@ -187,12 +233,30 @@ plot_ecbar = function(dp = NULL){
     e_bar(yval) %>%
     e_color(color = tab$color) %>%
     e_add("itemStyle", color) %>%
-    e_labels(position = 'right', fontSize = label_size, color=label_color,
+    e_labels(show = show_labels,
+             position = label_position,
+             fontSize = label_size,
+             color=label_color,
              formatter = htmlwidgets::JS(js_numform)) %>%
-    e_x_axis(type = "category", axisLabel = list(fontSize=x_label_size, color=x_label_color)) %>%
-    e_y_axis(show=FALSE,
-             min = y_min,
-             max = y_max) %>%
+    e_x_axis(type = "category",
+             axisLabel = list(fontSize=x_label_size, color=x_label_color)) %>%
+    e_y_axis(
+      show = show_yaxis,
+      name = yaxis_title,
+      nameLocation='middle',
+      nameGap=30,
+      nameTextStyle = list(color = yaxis_title_color, fontSize = yaxis_title_size),
+      axisLine=list(show=FALSE),
+      splitLine=list(show=show_ygrid, lineStyle = list(color=ygrid_color, opacity=1, width=fgrid_size)),
+      axisLabel = list(color=y_label_color, fontSize=y_label_size, formatter = htmlwidgets::JS(js_axisform)),
+      axisTick = list(show=FALSE),
+      min = y_min,
+      max = y_max,
+      z = 5
+    ) %>%
+    #e_y_axis(show=FALSE,
+    #         min = y_min,
+    #         max = y_max) %>%
     e_flip_coords() %>%
     #e_text_style(fontSize = 30, color='blue') %>%
     e_toolbox_feature(feature = "saveAsImage") %>%

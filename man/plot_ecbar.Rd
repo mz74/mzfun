@@ -15,6 +15,10 @@ plot_ecbar(dp = NULL)
 \item yval = 'y': column name with y-values
 \item group = 'group': column name for grouping (not needed)
 \item color = 'color': column name with color-values
+\item label_position = 'right': position of text labels ('none', 'top',
+'left', 'right', 'bottom', 'inside', 'insideLeft', 'insideRight',
+'insideTop', 'insideBottom', 'insideTopLeft', 'insideBottomLeft',
+'insideTopRight', 'insideBottomRight')
 \item label_color = '#A9A9A9': color of text labels
 \item x_label_color = '#606060': color of x-axis text labels
 \item label_size = 10: size of text labels
@@ -35,6 +39,14 @@ plot_ecbar(dp = NULL)
 \item title: chart title
 \item y_min = NULL: min. value on y-axis
 \item y_max = NULL: max. value on y-axis
+\item show_yaxis = FALSE: show y-axis (TRUE/FALSE)
+\item yaxis_title  = yval: name of y-axis (title)
+\item yaxis_title_size  = 15: text size of y-axis title
+\item yaxis_title_color  = '#606060': text color of yaxis title
+\item show_ygrid = FALSE: show y-grid
+\item ygrid_color = fgrey: color of y-grid
+\item y_label_color = '#606060'): color of y-axis text labels
+\item y_label_size  = 10: size of y-axis text labels
 }}
 }
 \value{
