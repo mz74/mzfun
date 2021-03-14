@@ -35,6 +35,10 @@
 #' \item legend_orient = 'horizontal': legend orientation (horizontal or vertical)
 #' \item chart_width = NULL: chart width (css units)
 #' \item chart_height = NULL: chart height (css units)
+#' \item x_min = 'dataMin': min. value on x-axis
+#' \item x_max = NULL: max. value on x-axis
+#' \item y_min = NULL: min. value on y-axis
+#' \item y_max = NULL: max. value on y-axis
 #' }
 #'
 #'
@@ -122,6 +126,12 @@ plot_ecscatter = function(dp = NULL){
   # chart size
   chart_width = df_assign(dp, 'chart_width', NULL)
   chart_height = df_assign(dp, 'chart_height', NULL)
+
+  # axes limits
+  x_min = df_assign(dp, 'x_min', 'dataMin')
+  x_max = df_assign(dp, 'x_max', NULL)
+  y_min = df_assign(dp, 'y_min', NULL)
+  y_max = df_assign(dp, 'y_max', NULL)
 
   # legend position and orientation
   legend_left = df_assign(dp, 'legend_left', 'auto')
@@ -238,7 +248,9 @@ plot_ecscatter = function(dp = NULL){
       splitLine=list(show=show_xgrid, lineStyle = list(color=fgrey, opacity=1, width=fgrid_size)),
       axisLabel = list(color=ax_label_color, fontSize=ax_label_size, formatter = htmlwidgets::JS("function (value) {var f= Intl.NumberFormat('de-DE').format(value); return f;}")),
       axisTick = list(show=FALSE),
-      min = 'dataMin'
+      min = x_min,
+      max = x_max
+      #min = 'dataMin'
     ) %>%
     e_y_axis(
       name = yaxis_title,
@@ -246,9 +258,10 @@ plot_ecscatter = function(dp = NULL){
       axisLine=list(show=FALSE),
       splitLine=list(show=show_ygrid, lineStyle = list(color=fgrey, opacity=1, width=fgrid_size)),
       axisLabel = list(color=ax_label_color, fontSize=ax_label_size, formatter = htmlwidgets::JS(js_axisform)),
-      axisTick = list(show=FALSE)
+      axisTick = list(show=FALSE),
+      min = y_min,
+      max = y_max
     ) %>%
-    e_legend(show = show_legend, right = '10%') %>%
     # e_x_axis(type = "category", axisLabel = list(fontSize=x_label_size, color=x_label_color)) %>%
     # e_y_axis(show=FALSE) %>%
     #e_flip_coords() %>%

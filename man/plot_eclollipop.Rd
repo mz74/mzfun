@@ -46,6 +46,8 @@ plot_eclollipop(dp = NULL)
 \item legend_orient = 'horizontal': legend orientation (horizontal or vertical)
 \item chart_width = NULL: chart width (css units)
 \item chart_height = NULL: chart height (css units)
+\item y_min = NULL: min. value on y-axis
+\item y_max = NULL: max. value on y-axis
 }}
 }
 \value{

@@ -39,6 +39,8 @@
 #' \item legend_orient = 'horizontal': legend orientation (horizontal or vertical)
 #' \item chart_width = NULL: chart width (css units)
 #' \item chart_height = NULL: chart height (css units)
+#' \item y_min = NULL: min. value on y-axis
+#' \item y_max = NULL: max. value on y-axis
 #' }
 #'
 #'
@@ -135,6 +137,10 @@ plot_eclollipop = function(dp = NULL){
   # chart size
   chart_width = df_assign(dp, 'chart_width', NULL)
   chart_height = df_assign(dp, 'chart_height', NULL)
+
+  # axes limits
+  y_min = df_assign(dp, 'y_min', NULL)
+  y_max = df_assign(dp, 'y_max', NULL)
 
   # legend position and orientation
   legend_left = df_assign(dp, 'legend_left', 'auto')
@@ -305,7 +311,9 @@ plot_eclollipop = function(dp = NULL){
       axisLine=list(show=FALSE),
       splitLine=list(show=show_ygrid, lineStyle = list(color=fgrey, opacity=1, width=fgrid_size)),
       axisLabel = list(color=y_label_color, fontSize=y_label_size, formatter = htmlwidgets::JS(js_axisform)),
-      axisTick = list(show=FALSE)
+      axisTick = list(show=FALSE),
+      min = y_min,
+      max = y_max
     ) %>%
 
     e_flip_coords() %>%

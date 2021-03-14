@@ -26,6 +26,8 @@
 #' \item legend_bottom = 'auto': legend position bottom
 #' \item legend_orient = 'horizontal': legend orientation (horizontal or vertical)
 #' \item title: chart title
+#' \item y_min = NULL: min. value on y-axis
+#' \item y_max = NULL: max. value on y-axis
 #' }
 #'
 #'
@@ -112,6 +114,10 @@ plot_ecbar = function(dp = NULL){
   chart_width = df_assign(dp, 'chart_width', NULL)
   chart_height = df_assign(dp, 'chart_height', NULL)
 
+  # axes limits
+  y_min = df_assign(dp, 'y_min', NULL)
+  y_max = df_assign(dp, 'y_max', NULL)
+
   # legend position and orientation
   legend_left = df_assign(dp, 'legend_left', 'auto')
   legend_right = df_assign(dp, 'legend_right', 'auto')
@@ -184,7 +190,9 @@ plot_ecbar = function(dp = NULL){
     e_labels(position = 'right', fontSize = label_size, color=label_color,
              formatter = htmlwidgets::JS(js_numform)) %>%
     e_x_axis(type = "category", axisLabel = list(fontSize=x_label_size, color=x_label_color)) %>%
-    e_y_axis(show=FALSE) %>%
+    e_y_axis(show=FALSE,
+             min = y_min,
+             max = y_max) %>%
     e_flip_coords() %>%
     #e_text_style(fontSize = 30, color='blue') %>%
     e_toolbox_feature(feature = "saveAsImage") %>%

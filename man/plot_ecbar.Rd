@@ -33,6 +33,8 @@ plot_ecbar(dp = NULL)
 \item legend_bottom = 'auto': legend position bottom
 \item legend_orient = 'horizontal': legend orientation (horizontal or vertical)
 \item title: chart title
+\item y_min = NULL: min. value on y-axis
+\item y_max = NULL: max. value on y-axis
 }}
 }
 \value{
