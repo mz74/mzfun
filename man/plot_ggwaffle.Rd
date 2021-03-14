@@ -67,6 +67,68 @@ dp = list(NULL)
 dp$tab = tab
 fplot = plot_ggwaffel(dp)
 fplot
+
+# -----------------------
+
+library(emojifont)
+library(mzfun)
+
+tab1 = data.table(
+  group = 'Chart 1',
+  segment = c('A', 'B', 'C'),
+  frequ = c(12, 13, 14),
+  color = c('blue', 'green', 'grey'),
+  label= fontawesome('fa-car'),
+  family='fontawesome-webfont',
+  label2 = emoji('airplane'),
+  family2 ='EmojiOne'
+)
+
+tab2 = data.table(
+  group = 'Chart 2',
+  segment = c('A', 'B', 'C'),
+  frequ = c(15, 16, 17),
+  color = c('blue', 'green', 'grey'),
+  label= fontawesome('fa-twitter'),
+  family='fontawesome-webfont',
+  label2 = emoji('airplane'),
+  family2 ='EmojiOne'
+)
+
+tab3 = rbind(tab1, tab2)
+
+dp = list(NULL)
+dp$tab = tab3
+dp$key_frequ = 'frequ'
+dp$key_group = 'segment'
+dp$key_facet = 'group'
+dp$key_color = 'color'
+dp$key_label = 'label'
+dp$key_family = 'family'
+#dp$label = fontawesome('fa-female')
+#dp$family ='fontawesome-webfont'
+#dp$label = 'a'
+dp$size = 15
+dp$cols = 4
+dp$orientation = 'horizontal'
+#dp$color = c('grey', 'black')
+dp$facet_ncol = 1
+dp$align = 'center'
+dp$legend = 'label'
+dp$facet_title_position = 'top'
+dp$font = 'serif'
+dp$facet_margin = 2
+
+fplot = plot_ggwaffle(dp)
+fplot
+
+# ------------------------
+
+dp$key_label = 'label2'
+dp$key_family = 'family2'
+
+fplot = plot_ggwaffle(dp)
+fplot
 }
 
 }
