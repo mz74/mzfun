@@ -200,6 +200,11 @@ plot_eclollipop = function(dp = NULL){
   names(tab)[names(tab) == yval] = 'yval'
   names(tab)[names(tab) == col] = 'color'
 
+  # percent values
+  if (text_format == 'percent'){
+    tab[, yval := yval * 100]
+  }
+
   # prepare table for lollipop
   dt1 = (tab %>% copy)[, key := paste0('k', (.N %>% seq))][, dyval := yval %>% copy]
   dt2 = (tab %>% copy)[, key := paste0('k', (.N %>% seq))][, dyval := 0][, yval := NA]
@@ -225,7 +230,7 @@ plot_eclollipop = function(dp = NULL){
     return g + '<br>' +'Wert: '+f;}"
 
   if (text_format == 'percent'){
-    tab[, yval := yval * 100]
+    #tab[, yval := yval * 100]   # see above
     js_numform = "function (params) {
     let f= Intl.NumberFormat('de-DE').format(params.value[0]);
     return f+'%';}"
