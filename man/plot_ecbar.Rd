@@ -36,7 +36,11 @@ plot_ecbar(dp = NULL)
 \item legend_top = 'auto': legend position top
 \item legend_bottom = 'auto': legend position bottom
 \item legend_orient = 'horizontal': legend orientation (horizontal or vertical)
-\item title: chart title
+\item title = NULL: chart title
+\item title_left = margin_left: left position of title
+\item title_top  = 'auto': top position of title
+\item title_size = 18: text size of title
+\item title_color = x_label_color: text color of title
 \item y_min = NULL: min. value on y-axis
 \item y_max = NULL: max. value on y-axis
 \item show_yaxis = FALSE: show y-axis (TRUE/FALSE)

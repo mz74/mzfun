@@ -15,7 +15,11 @@ plot_echeatmap(dp = NULL)
 \item yval = 'y': column name with y-values, categorical or integer values
 \item zval = 'z': column name with z-values, numerical values
 \item color = 'c('#fef8cb', '#ba8d7e'): color vector defining color palette
-\item title: chart title
+\item title = NULL: chart title
+\item title_left = margin_left: left position of title
+\item title_top  = 'auto': top position of title
+\item title_size = 18: text size of title
+\item title_color = x_label_color: text color of title
 \item text_format = '': text format is '' (standard), 'percent', or 'euro'
 \item show_label = TRUE: show text labels (TRUE/FALSE)
 \item label_color = '#606060': color of text labels

@@ -19,7 +19,11 @@ plot_ecdot(dp = NULL)
 \item linesize = 2: line width of line plot
 \item show_line = TRUE: show horizontal lines (TRUE/FALSE)
 \item line_color = '#A9A9A9': color of horizontal lines
-\item title: chart title
+\item title = NULL: chart title
+\item title_left = margin_left: left position of title
+\item title_top  = 'auto': top position of title
+\item title_size = 18: text size of title
+\item title_color = x_label_color: text color of title
 \item text_format = '': text format is '' (standard), 'percent', or 'euro'
 \item show_label = TRUE: show text labels (TRUE/FALSE)
 \item label_color = '#A9A9A9': color of text labels

@@ -9,7 +9,11 @@
 #' \item color = 'color': column name with colors
 #' \item pointsize = 8: symbol size
 #' \item linesize = 2: line width of line plot
-#' \item title: chart title
+#' \item title = NULL: chart title
+#' \item title_left = margin_left: left position of title
+#' \item title_top  = 'auto': top position of title
+#' \item title_size = 18: text size of title
+#' \item title_color = x_label_color: text color of title
 #' \item text_format = '': text format is '' (standard), 'percent', or 'euro'
 #' \item show_label = TRUE: show text labels (TRUE/FALSE)
 #' \item label_color = '#A9A9A9': color of text labels
@@ -191,6 +195,12 @@ plot_eclollipop = function(dp = NULL){
   show_xaxis_line = ifelse('show_xaxis_line'  %in% names(dp), dp$show_xaxis_line, FALSE)
   show_yaxis = ifelse('show_yaxis'  %in% names(dp), dp$show_yaxis, FALSE)
 
+  #title
+  title_left = df_assign(dp, 'title_left', margin_left)
+  title_top  = df_assign(dp, 'title_top',  'auto')
+  title_size = df_assign(dp, 'title_size',  18)
+  title_color = df_assign(dp, 'title_color', x_label_color)
+
 
   # axis grid
   show_xgrid = ifelse('show_xgrid'  %in% names(dp), dp$show_xgrid, FALSE)
@@ -329,7 +339,14 @@ plot_eclollipop = function(dp = NULL){
 
   # Title
   if ('title' %in% names(dp)){
-    fplot = fplot %>% e_title(dp$title, left = margin_left)
+    fplot = fplot %>% e_title(dp$title,
+                              left = title_left,
+                              top = title_top,
+                              textStyle = list(
+                                color = title_color,
+                                fontSize = title_size
+                              )
+    )
   }
 
   # Legend

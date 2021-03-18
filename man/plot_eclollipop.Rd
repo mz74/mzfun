@@ -16,7 +16,11 @@ plot_eclollipop(dp = NULL)
 \item color = 'color': column name with colors
 \item pointsize = 8: symbol size
 \item linesize = 2: line width of line plot
-\item title: chart title
+\item title = NULL: chart title
+\item title_left = margin_left: left position of title
+\item title_top  = 'auto': top position of title
+\item title_size = 18: text size of title
+\item title_color = x_label_color: text color of title
 \item text_format = '': text format is '' (standard), 'percent', or 'euro'
 \item show_label = TRUE: show text labels (TRUE/FALSE)
 \item label_color = '#A9A9A9': color of text labels

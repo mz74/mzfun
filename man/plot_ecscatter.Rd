@@ -17,7 +17,11 @@ plot_ecscatter(dp = NULL)
 \item color = NULL: color vector
 \item pointsize = 8: symbol size
 \item linesize = 2: line width of line plot
-\item title: chart title
+\item title = NULL: chart title
+\item title_left = margin_left: left position of title
+\item title_top  = 'auto': top position of title
+\item title_size = 18: text size of title
+\item title_color = axis_title_color: text color of title
 \item text_format = '': text format is '' (standard), 'percent', or 'euro'
 \item show_label = FALSE: show text labels (TRUE/FALSE)
 \item label_color = '#A9A9A9': color of text labels

@@ -29,7 +29,11 @@
 #' \item legend_top = 'auto': legend position top
 #' \item legend_bottom = 'auto': legend position bottom
 #' \item legend_orient = 'horizontal': legend orientation (horizontal or vertical)
-#' \item title: chart title
+#' \item title = NULL: chart title
+#' \item title_left = margin_left: left position of title
+#' \item title_top  = 'auto': top position of title
+#' \item title_size = 18: text size of title
+#' \item title_color = x_label_color: text color of title
 #' \item y_min = NULL: min. value on y-axis
 #' \item y_max = NULL: max. value on y-axis
 #' \item show_yaxis = FALSE: show y-axis (TRUE/FALSE)
@@ -160,6 +164,12 @@ plot_ecbar = function(dp = NULL){
   x_label_color = ifelse('x_label_color' %in% names(dp), dp$x_label_color, '#606060')
   x_label_size  = ifelse('x_label_size'  %in% names(dp), dp$x_label_size, 15)
 
+  #title
+  title_left = df_assign(dp, 'title_left', margin_left)
+  title_top  = df_assign(dp, 'title_top',  'auto')
+  title_size = df_assign(dp, 'title_size',  18)
+  title_color = df_assign(dp, 'title_color', x_label_color)
+
   # y-axis
   show_yaxis = df_assign(dp, 'show_yaxis', FALSE)
   yaxis_title  = df_assign(dp, 'yaxis_title', yval)
@@ -265,7 +275,14 @@ plot_ecbar = function(dp = NULL){
 
   # Title
   if ('title' %in% names(dp)){
-    fplot = fplot %>% e_title(dp$title, left = margin_left)
+    fplot = fplot %>% e_title(dp$title,
+                              left = title_left,
+                              top = title_top,
+                              textStyle = list(
+                                color = title_color,
+                                fontSize = title_size
+                              )
+    )
   }
   # Legend
   if ('legend' %in% names(dp)){
