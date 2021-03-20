@@ -241,7 +241,7 @@ plot_ecbar = function(dp = NULL){
     e_charts(xval, width = chart_width, height = chart_height) %>%
     e_grid(left = margin_left, right = margin_right, top = margin_top, bottom = margin_bottom) %>%
     e_bar(yval) %>%
-    e_color(color = tab$color) %>%
+    e_color(color = tab$color %>% unique) %>%
     e_add("itemStyle", color) %>%
     e_labels(show = show_labels,
              position = label_position,
