@@ -236,6 +236,10 @@ plot_ggwaffle = function(dp){
     dtab[, facet_ := 'facet']
   }
 
+  # prepare levels for factor
+  levels_facet = dtab$facet_ %>% unique()
+  levels_group = dtab$group_ %>% unique()
+
   # prepare xy-template with max. spread per facet
   d1 = dtab[, .(Anzahl = frequ_ %>% sum(na.rm = TRUE)), by=.(facet_)]
   dmax = max(d1$Anzahl, na.rm = TRUE) # max nb of elements in a facet
@@ -310,6 +314,10 @@ plot_ggwaffle = function(dp){
 
 
   d1 = tab[, .(.N), by=.(facet, group, color)]
+
+  # order and factors
+  tab[, facet := facet %>% factor(levels = levels_facet)]
+  tab[, group := group %>% factor(levels = levels_group)]
 
   fplot = ggplot(data = tab) +
     geom_point(data=tab, aes(x, y, color = group), size=7, alpha=0)  +
