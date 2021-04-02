@@ -60,6 +60,11 @@ a ggplot waffle chart
 \description{
 Waffle Plot
 }
+\section{Resources}{
+
+Unicode table: \url{https://unicode-table.com/de/}
+}
+
 \examples{
 \dontrun{plot_ggwaffel(dp)}
 \dontrun{
