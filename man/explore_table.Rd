@@ -9,6 +9,8 @@ explore_table(
   ftarget = NA,
   fassign_classes = TRUE,
   fadd_tables = TRUE,
+  ft_format = TRUE,
+  ftmax_levels = 50,
   fadd_plots = FALSE,
   fprm_na = FALSE,
   fptext_labels = FALSE,
@@ -26,6 +28,11 @@ Optional. Use ftarget = NA to explore the table without target column.}
 
 \item{fadd_tables}{TRUE or FALSE. Add or not add a table.}
 
+\item{ft_format}{TRUE or FALSE. Format or not format the table values.}
+
+\item{ftmax_levels}{Integer. Maximum number of table rows.
+Set NA to ignore constraint.}
+
 \item{fadd_plots}{TRUE or FALSE. Add or not add a plot.}
 
 \item{fprm_na}{TRUE or FALSE. Remove or not remove NAs before plotting.}
@@ -40,12 +47,97 @@ bar plot instead of line plot.}
 \value{
 list with several elements:
 \emph{summary}: the summary statistics.
-\emph{plot$name$count}: ggplot of absolute frequencies of property \emph{name}.
-\emph{plot$name$rel}: ggplot of relative frequencies of property \emph{name}.
+\emph{plot$name$count}: ggplots of absolute frequencies of each column.
+\emph{plot$name$rel}: ggplots of relative frequencies of each column.
 }
 \description{
 Summary statistics and plots of the table columns.
 }
 \examples{
-\dontrun{explore_table(dt)}
+\dontrun{
+---
+title: "My document"
+date: "`r Sys.Date()`"
+author: mz
+output:
+  rmdformats::downcute:
+  self_contained: true
+  thumbnails: true
+  lightbox: true
+  gallery: false
+  highlight: tango
+---
+
+<style>
+.page-content img.image-thumb {
+width: 400px;
+border: 1px solid #CCC;
+padding: 0;
+}
+
+li {
+height: 30px;
+}
+
+summary:focus {
+outline: none;
+}
+
+summary:hover {
+text-decoration: underline;
+}
+
+</style>
+
+```{r, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE)
+knitr::opts_chunk$set(warning = FALSE)
+knitr::opts_chunk$set(message = FALSE)
+```
+
+```{r}
+library(mzfun)
+library(magrittr)
+library(data.table)
+library(ggplot2)
+library(flextable)
+library(knitr)
+library(DT)
+library(htmltools)
+```
+
+```{r}
+et1 = explore_table(copy(d3[1:1000]), ftarget ='Anrede', fassign_classes = TRUE,
+  fadd_tables = TRUE, fadd_plots = TRUE, fpmax_numlevels = 20, fprm_na = FALSE,
+  fpmax_faclevels = 50, fptext_labels = TRUE, ft_format = FALSE)
+```
+
+```{r, results='asis'}
+dnames = et1$plot \%>\% names
+i = dnames[1]
+cat('# Summary', '\n\n')
+datatable(et1$summary)
+out = NULL
+cat('\n\r')
+for (i in dnames){
+  cat('#', i, '\n')
+  et1$plot[[i]]$count \%>\% print
+  et1$plot[[i]]$rel \%>\% print
+  cat('\n\r')
+  cat('<details>')
+  cat('\n\r')
+  cat('<summary>Tabelle</summary>')
+  cat('\n\r')
+  dtable = et1$table[[i]] \%>\% flextable() \%>\%
+    align(align = 'right', part = 'all') \%>\%
+    align(j = 1, align = 'left', part = 'all')
+  cat(knit_print(dtable))
+
+  cat('\n\r')
+  cat('</details>')
+  cat('\n\r')
+  cat('\n\r')
+}
+```
+}
 }

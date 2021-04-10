@@ -5,6 +5,9 @@
 #' Optional. Use ftarget = NA to explore the table without target column.
 #' @param fassign_classes TRUE or FALSE. TRUE assigns a new class to each column.
 #' @param fadd_tables TRUE or FALSE. Add or not add a table.
+#' @param ft_format TRUE or FALSE. Format or not format the table values.
+#' @param ftmax_levels Integer. Maximum number of table rows.
+#' Set NA to ignore constraint.
 #' @param fadd_plots TRUE or FALSE. Add or not add a plot.
 #' @param fprm_na TRUE or FALSE. Remove or not remove NAs before plotting.
 #' @param fptext_labels TRUE or FALSE. Add or not add text labels to bar plots.
@@ -14,8 +17,8 @@
 #'
 #' @return list with several elements:
 #' _summary_: the summary statistics.
-#' _plot$name$count_: ggplot of absolute frequencies of property _name_.
-#' _plot$name$rel_: ggplot of relative frequencies of property _name_.
+#' _plot$name$count_: ggplots of absolute frequencies of each column.
+#' _plot$name$rel_: ggplots of relative frequencies of each column.
 #'
 #' @export
 #'
@@ -23,11 +26,98 @@
 #' @import data.table
 #'
 #' @examples
-#' \dontrun{explore_table(dt)}
+#' \dontrun{
+#' ---
+#' title: "My document"
+#' date: "`r Sys.Date()`"
+#' author: mz
+#' output:
+#'   rmdformats::downcute:
+#'   self_contained: true
+#'   thumbnails: true
+#'   lightbox: true
+#'   gallery: false
+#'   highlight: tango
+#' ---
+#'
+#' <style>
+#' .page-content img.image-thumb {
+#' width: 400px;
+#' border: 1px solid #CCC;
+#' padding: 0;
+#' }
+#'
+#' li {
+#' height: 30px;
+#' }
+#'
+#' summary:focus {
+#' outline: none;
+#' }
+#'
+#' summary:hover {
+#' text-decoration: underline;
+#' }
+#'
+#' </style>
+#'
+#' ```{r, include=FALSE}
+#' knitr::opts_chunk$set(echo = FALSE)
+#' knitr::opts_chunk$set(warning = FALSE)
+#' knitr::opts_chunk$set(message = FALSE)
+#' ```
+#'
+#' ```{r}
+#' library(mzfun)
+#' library(magrittr)
+#' library(data.table)
+#' library(ggplot2)
+#' library(flextable)
+#' library(knitr)
+#' library(DT)
+#' library(htmltools)
+#' ```
+#'
+#' ```{r}
+#' et1 = explore_table(copy(d3[1:1000]), ftarget ='Anrede', fassign_classes = TRUE,
+#'   fadd_tables = TRUE, fadd_plots = TRUE, fpmax_numlevels = 20, fprm_na = FALSE,
+#'   fpmax_faclevels = 50, fptext_labels = TRUE, ft_format = FALSE)
+#' ```
+#'
+#' ```{r, results='asis'}
+#' dnames = et1$plot %>% names
+#' i = dnames[1]
+#' cat('# Summary', '\n\n')
+#' datatable(et1$summary)
+#' out = NULL
+#' cat('\n\r')
+#' for (i in dnames){
+#'   cat('#', i, '\n')
+#'   et1$plot[[i]]$count %>% print
+#'   et1$plot[[i]]$rel %>% print
+#'   cat('\n\r')
+#'   cat('<details>')
+#'   cat('\n\r')
+#'   cat('<summary>Tabelle</summary>')
+#'   cat('\n\r')
+#'   dtable = et1$table[[i]] %>% flextable() %>%
+#'     align(align = 'right', part = 'all') %>%
+#'     align(j = 1, align = 'left', part = 'all')
+#'   cat(knit_print(dtable))
+#'
+#'   cat('\n\r')
+#'   cat('</details>')
+#'   cat('\n\r')
+#'   cat('\n\r')
+#' }
+#' ```
+#' }
 explore_table = function(ftable,
                          ftarget = NA,
                          fassign_classes = TRUE,
                          fadd_tables = TRUE,
+                         ft_format = TRUE,
+                         ftmax_levels = 50,
                          fadd_plots = FALSE,
                          fprm_na = FALSE,
                          fptext_labels = FALSE,
@@ -139,7 +229,7 @@ explore_table = function(ftable,
   # tables
   # ----------------------------------------------------------------------
 
-  i = dcols[1]
+  i = dcols[2]
   if (fadd_tables == TRUE){
     for (i in dcols){
 
@@ -225,24 +315,35 @@ explore_table = function(ftable,
       # prepare order
       # order
 
-      # format
-      dtab[, Absolut := format(Absolut, big.mark   = '.', decimal.mark = ',', trim=TRUE, justify = 'right')]
-      dtab[, Relativ := format(signif(100*Relativ, 3), big.mark   = '.', decimal.mark = ',', trim=TRUE, justify = 'right')]
-      dtab[, Relativ := paste0(Relativ, '%')]
+      # NAs to 0
+      dtab[is.na(dtab)] = 0
+      dtab2[is.na(dtab2)] = 0
+      dtab3[is.na(dtab3)] = 0
+      dtab4[is.na(dtab4)] = 0
 
-      ## for Segments
-      d2cols = names(dtab2)[-1]
-      dtab2[, c(d2cols) := lapply(.SD, function(x) {format(x, big.mark   = '.', decimal.mark = ',', trim=TRUE, justify = 'right')}), .SDcols = d2cols]
+      if (ft_format == TRUE){
+        # format
+        dtab[, Absolut := format(Absolut, big.mark   = '.', decimal.mark = ',', trim=TRUE, justify = 'right')]
+        dtab[, Relativ := format(signif(100*Relativ, 3), big.mark   = '.', decimal.mark = ',', trim=TRUE, justify = 'right')]
+        dtab[, Relativ := paste0(Relativ, '%')]
 
-      ## for Relativ
-      d2cols = names(dtab3)[-1]
-      dtab3[, c(d2cols) := lapply(.SD, function(x) {format(signif(100*x, 3), big.mark   = '.', decimal.mark = ',', trim=TRUE, justify = 'right')}), .SDcols = d2cols]
-      dtab3[, c(d2cols) := lapply(.SD, function(x) {paste0(x, '%')}), .SDcols = d2cols]
+        ## for Segments
+        d2cols = names(dtab2)[-1]
+        dtab2[, c(d2cols) := lapply(.SD, function(x) {format(x, big.mark   = '.', decimal.mark = ',', trim=TRUE, justify = 'right')}), .SDcols = d2cols]
 
-      ## for Anteile
-      d2cols = names(dtab4)[-1]
-      dtab4[, c(d2cols) := lapply(.SD, function(x) {format(signif(100*x, 3), big.mark   = '.', decimal.mark = ',', trim=TRUE, justify = 'right')}), .SDcols = d2cols]
-      dtab4[, c(d2cols) := lapply(.SD, function(x) {paste0(x, '%')}), .SDcols = d2cols]
+        ## for Relativ
+        d2cols = names(dtab3)[-1]
+        dtab3[, c(d2cols) := lapply(.SD, function(x) {format(signif(100*x, 3), big.mark   = '.', decimal.mark = ',', trim=TRUE, justify = 'right')}), .SDcols = d2cols]
+        dtab3[, c(d2cols) := lapply(.SD, function(x) {paste0(x, '%')}), .SDcols = d2cols]
+
+        ## for Anteile
+        d2cols = names(dtab4)[-1]
+        dtab4[, c(d2cols) := lapply(.SD, function(x) {format(signif(100*x, 3), big.mark   = '.', decimal.mark = ',', trim=TRUE, justify = 'right')}), .SDcols = d2cols]
+        dtab4[, c(d2cols) := lapply(.SD, function(x) {paste0(x, '%')}), .SDcols = d2cols]
+
+
+      }
+
 
 
       if (!is.na(ftarget)){
@@ -253,6 +354,16 @@ explore_table = function(ftable,
 
       # order
       dtab = dtab[order(tar1)]
+
+      # check number of levels
+      if (!is.na(ftmax_levels) & nrow(dtab) > ftmax_levels){
+        dtab5 = dtab[c(1:ftmax_levels)]
+        dtab6 = dtab[1][, lapply(.SD, function(x) {return ('')})]
+        dtab6[, tar1 := '...']
+        dtab7 = dtab[.N]
+        dtab = rbind(dtab5, dtab6, dtab7)
+      }
+
       names(dtab)[names(dtab) == 'tar1'] = i
       res$table[[i]] = dtab
     }
